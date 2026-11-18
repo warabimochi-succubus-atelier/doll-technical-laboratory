@@ -1,0 +1,54 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const siteName = 'どーる技術研究室';
+const { title, description = '未経験の技法を試し、その結果を記録するための研究室。' } = Astro.props;
+const pageTitle = title ? `${title} | ${siteName}` : siteName;
+const path = Astro.url.pathname;
+const nav = [
+  { href: '/', label: 'トップ' },
+  { href: '/techniques/', label: '技術リスト' },
+  { href: '/logs/', label: '制作ログ' },
+];
+---
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{pageTitle}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Zen+Old+Mincho:wght@600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="/" class="site-logo">
+        <span class="site-logo-sub">わらびもちサキュバス工房</span>
+        {siteName}
+      </a>
+      <nav>
+        {nav.map((n) => (
+          <a href={n.href} aria-current={(n.href === '/' ? path === '/' : path.startsWith(n.href)) ? 'page' : undefined}>
+            {n.label}
+          </a>
+        ))}
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <p>つくる、ためす、まなぶ、そしてもっと、かわいく。</p>
+      <p><small>© わらびもちサキュバス工房</small></p>
+    </footer>
+  </body>
+</html>

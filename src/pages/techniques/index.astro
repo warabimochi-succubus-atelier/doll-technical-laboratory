@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getTechniquesByCategory } from '../../lib/stats';
+
+const groups = await getTechniquesByCategory();
+---
+<BaseLayout title="技術リスト">
+  <section class="card">
+    <h1>技術リスト</h1>
+    <p>試してみたい技法の一覧。制作ログで使うと自動でチェックが付きます。</p>
+  </section>
+
+  {groups.map((g) => (
+    <section class="card">
+      <h2>{g.category}</h2>
+      {g.items.length === 0 ? (
+        <p class="muted">まだ技法が登録されていません。</p>
+      ) : (
+        <ul class="tech-list">
+          {g.items.map(({ entry, count }) => (
+            <li class={count > 0 ? 'tried' : ''}>
+              <a href={`/techniques/${entry.id}/`}>
+                <span class="check" aria-hidden="true">{count > 0 ? '☑' : '☐'}</span>
+                {entry.data.name}
+                {count > 0 && <span class="count">{count}回</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  ))}
+</BaseLayout>

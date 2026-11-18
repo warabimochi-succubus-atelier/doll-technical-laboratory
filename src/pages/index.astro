@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StarMeter from '../components/StarMeter.astro';
+import { getCategoryExperience, getLogs, getTechniquesByCategory, formatDate } from '../lib/stats';
+
+const experience = await getCategoryExperience();
+const recentLogs = (await getLogs()).slice(0, 3);
+const untried = (await getTechniquesByCategory())
+  .flatMap((g) => g.items)
+  .filter((i) => i.count === 0)
+  .map((i) => ({ id: i.entry.id, name: i.entry.data.name, category: i.entry.data.category }));
+---
+<BaseLayout>
+  <section class="hero">
+    <img src="/images/hero.png" alt="どーる技術研究室 — Doll Technical Laboratory" />
+  </section>
+
+  <section class="card concept">
+    <h1>どーる技術研究室</h1>
+    <p class="lead">ドールメイクに正解はない。だから、研究する。</p>
+    <p>未経験の技法を試し、その結果を記録するための研究室。</p>
+    <ul>
+      <li>次に試すことを見つける</li>
+      <li>技術の引き出しを増やす</li>
+      <li>制作経験を蓄積する</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>研究の蓄積</h2>
+    <dl class="exp-list">
+      {experience.map((e) => (
+        <div class="exp-row">
+          <dt>{e.category}</dt>
+          <dd><StarMeter value={e.exp} /></dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  {untried.length > 0 && (
+    <section class="card suggest">
+      <h2>今日はこれを試してみる？</h2>
+      <p class="suggest-pick" id="suggest-pick">
+        <a href={`/techniques/${untried[0].id}/`}>
+          <span class="tag">{untried[0].category}</span>{untried[0].name}
+        </a>
+      </p>
+      <button type="button" id="suggest-reroll">ほかの技法にする</button>
+      <script is:inline define:vars={{ untried }}>
+        const el = document.getElementById('suggest-pick');
+        const pick = () => {
+          const t = untried[Math.floor(Math.random() * untried.length)];
+          el.innerHTML = `<a href="/techniques/${encodeURIComponent(t.id)}/"><span class="tag">${t.category}</span>${t.name}</a>`;
+        };
+        pick();
+        document.getElementById('suggest-reroll').addEventListener('click', pick);
+      </script>
+    </section>
+  )}
+
+  <section class="card">
+    <h2>最近の制作ログ</h2>
+    <ul class="log-list">
+      {recentLogs.map((log) => (
+        <li>
+          <a href={`/logs/${log.id}/`}>
+            <time>{formatDate(log.data.date)}</time>
+            <span class="log-doll">{log.data.doll}</span>
+            <span class="log-techs">{log.data.techniques.map((t) => t.id).join('・')}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="more"><a href="/logs/">すべてのログ →</a></p>
+  </section>
+</BaseLayout>

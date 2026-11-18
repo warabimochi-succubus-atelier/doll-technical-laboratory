@@ -1,0 +1,31 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate } from '../../lib/stats';
+
+export async function getStaticPaths() {
+  const logs = await getCollection('logs');
+  return logs.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const date = formatDate(entry.data.date);
+---
+<BaseLayout title={`${date} ${entry.data.doll}`}>
+  <article class="card">
+    <p class="muted"><time>{date}</time></p>
+    <h1>{entry.data.doll}</h1>
+
+    <h2>試した技術</h2>
+    <p>{entry.data.techniques.map((t) => <a class="tag" href={`/techniques/${t.id}/`}>{t.id}</a>)}</p>
+
+    <h2>感想</h2>
+    <ul class="impressions">
+      {entry.data.impressions.map((i) => <li>{i}</li>)}
+    </ul>
+
+    <div class="prose"><Content /></div>
+  </article>
+  <p class="more"><a href="/logs/">← 制作ログ一覧へ</a></p>
+</BaseLayout>

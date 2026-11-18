@@ -1,0 +1,40 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getLogs, formatDate } from '../../lib/stats';
+
+export async function getStaticPaths() {
+  const techniques = await getCollection('techniques');
+  return techniques.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const logs = (await getLogs()).filter((log) => log.data.techniques.some((t) => t.id === entry.id));
+---
+<BaseLayout title={entry.data.name}>
+  <section class="card">
+    <p class="tag">{entry.data.category}</p>
+    <h1>{entry.data.name}</h1>
+    <div class="prose"><Content /></div>
+  </section>
+
+  <section class="card">
+    <h2>この技法を試した記録</h2>
+    {logs.length === 0 ? (
+      <p class="muted">まだ試していません。次の制作で試してみる？</p>
+    ) : (
+      <ul class="log-list">
+        {logs.map((log) => (
+          <li>
+            <a href={`/logs/${log.id}/`}>
+              <time>{formatDate(log.data.date)}</time>
+              <span class="log-doll">{log.data.doll}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+  <p class="more"><a href="/techniques/">← 技術リストへ</a></p>
+</BaseLayout>
