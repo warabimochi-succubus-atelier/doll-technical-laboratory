@@ -12,10 +12,11 @@ const untried = (await getTechniquesByCategory())
 ---
 <BaseLayout>
   <section class="hero">
-    <img src="/images/hero.png" alt="どーる技術研究室 — Doll Technical Laboratory" />
+    <img src="/images/top.webp" alt="どーる技術研究室 — Doll Technical Laboratory" />
   </section>
 
   <section class="card concept">
+    <img class="concept-emblem" src="/images/emblem.webp" alt="" width="200" height="200" loading="lazy" />
     <h1>どーる技術研究室</h1>
     <p class="lead">ドールメイクに正解はない。だから、研究する。</p>
     <p>未経験の技法を試し、その結果を記録するための研究室。</p>
@@ -40,13 +41,16 @@ const untried = (await getTechniquesByCategory())
 
   {untried.length > 0 && (
     <section class="card suggest">
-      <h2>今日はこれを試してみる？</h2>
-      <p class="suggest-pick" id="suggest-pick">
-        <a href={`/techniques/${untried[0].id}/`}>
-          <span class="tag">{untried[0].category}</span>{untried[0].name}
-        </a>
-      </p>
-      <button type="button" id="suggest-reroll">ほかの技法にする</button>
+      <img class="suggest-mascot" src="/images/mascot.webp" alt="" width="180" height="180" loading="lazy" />
+      <div class="suggest-body">
+        <h2>今日はこれを試してみる？</h2>
+        <p class="suggest-pick" id="suggest-pick">
+          <a href={`/techniques/${untried[0].id}/`}>
+            <span class="tag">{untried[0].category}</span>{untried[0].name}
+          </a>
+        </p>
+        <button type="button" id="suggest-reroll">ほかの技法にする</button>
+      </div>
       <script is:inline define:vars={{ untried }}>
         const el = document.getElementById('suggest-pick');
         const pick = () => {
