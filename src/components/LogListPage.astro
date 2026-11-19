@@ -1,0 +1,57 @@
+---
+// 制作ログ一覧の1ページ分（/logs/ と /logs/page/n/ で共通）
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Impressions from './Impressions.astro';
+import { formatDate, type Log } from '../lib/stats';
+import { logsPageUrl } from '../lib/pagination';
+
+interface Props {
+  logs: Log[];
+  current: number;
+  total: number;
+  count: number;
+}
+const { logs, current, total, count } = Astro.props;
+const pages = Array.from({ length: total }, (_, i) => i + 1);
+---
+<BaseLayout title={current === 1 ? '制作ログ' : `制作ログ（${current}ページ目）`}>
+  <section class="card">
+    <h1>制作ログ</h1>
+    <p>制作ごとの記録。何を試して、どう感じたか。</p>
+    <p class="muted">全{count}件{total > 1 && `・${current} / ${total}ページ`}</p>
+  </section>
+
+  {logs.map((log) => (
+    <article class="card log-card">
+      <h2><a href={`/logs/${log.id}/`}>{formatDate(log.data.date)}</a></h2>
+      <dl class="log-meta">
+        <dt>対象</dt><dd>{log.data.doll}</dd>
+        <dt>試した技術</dt>
+        <dd>
+          {log.data.techniques.map((t) => <a class="tag" href={`/techniques/${t.id}/`}>{t.id}</a>)}
+        </dd>
+      </dl>
+      <Impressions log={log} />
+    </article>
+  ))}
+
+  {total > 1 && (
+    <nav class="pager" aria-label="ページ切り替え">
+      {current > 1
+        ? <a class="pager-step" href={logsPageUrl(current - 1)}>← 新しいログ</a>
+        : <span class="pager-step" aria-hidden="true"></span>}
+      <ol class="pager-pages">
+        {pages.map((n) => (
+          <li>
+            {n === current
+              ? <span aria-current="page">{n}</span>
+              : <a href={logsPageUrl(n)}>{n}</a>}
+          </li>
+        ))}
+      </ol>
+      {current < total
+        ? <a class="pager-step" href={logsPageUrl(current + 1)}>古いログ →</a>
+        : <span class="pager-step" aria-hidden="true"></span>}
+    </nav>
+  )}
+</BaseLayout>

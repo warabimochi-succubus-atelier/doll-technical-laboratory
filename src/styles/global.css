@@ -144,6 +144,16 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
 .log-meta { display: grid; grid-template-columns: 6em 1fr; gap: .25rem; margin: 0 0 .75rem; }
 .log-meta dt { color: var(--muted); }
 .log-meta dd { margin: 0; }
+.pager { display: flex; align-items: center; justify-content: space-between; gap: .5rem; flex-wrap: wrap; }
+.pager-step { min-width: 7em; }
+.pager-step:last-child { text-align: right; }
+.pager-pages { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: .35rem; }
+.pager-pages a, .pager-pages span {
+  display: inline-block; min-width: 2.2em; padding: .15rem .5rem; text-align: center;
+  border: 1px solid var(--border); border-radius: 999px; background: var(--surface);
+}
+.pager-pages span[aria-current='page'] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
 .impressions { margin: 0; }
 .impression-group { margin-bottom: .5rem; }
 .impression-group:last-child { margin-bottom: 0; }

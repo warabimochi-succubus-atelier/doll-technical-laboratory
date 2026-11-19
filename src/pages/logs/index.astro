@@ -1,27 +1,9 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Impressions from '../../components/Impressions.astro';
-import { getLogs, formatDate } from '../../lib/stats';
+import LogListPage from '../../components/LogListPage.astro';
+import { getLogs } from '../../lib/stats';
+import { splitPages } from '../../lib/pagination';
 
 const logs = await getLogs();
+const pages = splitPages(logs);
 ---
-<BaseLayout title="制作ログ">
-  <section class="card">
-    <h1>制作ログ</h1>
-    <p>制作ごとの記録。何を試して、どう感じたか。</p>
-  </section>
-
-  {logs.map((log) => (
-    <article class="card log-card">
-      <h2><a href={`/logs/${log.id}/`}>{formatDate(log.data.date)}</a></h2>
-      <dl class="log-meta">
-        <dt>対象</dt><dd>{log.data.doll}</dd>
-        <dt>試した技術</dt>
-        <dd>
-          {log.data.techniques.map((t) => <a class="tag" href={`/techniques/${t.id}/`}>{t.id}</a>)}
-        </dd>
-      </dl>
-      <Impressions log={log} />
-    </article>
-  ))}
-</BaseLayout>
+<LogListPage logs={pages[0]} current={1} total={pages.length} count={logs.length} />
