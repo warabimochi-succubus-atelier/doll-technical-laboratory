@@ -1,0 +1,8 @@
+// 研究理念の3つの言葉。制作ログの感想はこのどれかに分けて書く（表示順）
+export const reactions = [
+  { key: 'どやぁ', note: '成功' },
+  { key: 'ぐぬぬ', note: '苦戦' },
+  { key: 'はて？', note: '疑問' },
+] as const;
+
+export type Reaction = (typeof reactions)[number]['key'];

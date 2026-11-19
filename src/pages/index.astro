@@ -1,9 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StarMeter from '../components/StarMeter.astro';
-import { getCategoryExperience, getLogs, getTechniquesByCategory, formatDate } from '../lib/stats';
+import { getReactionCounts, getLogs, getTechniquesByCategory, formatDate } from '../lib/stats';
 
-const experience = await getCategoryExperience();
+const reactionCounts = await getReactionCounts();
 const recentLogs = (await getLogs()).slice(0, 3);
 const untried = (await getTechniquesByCategory())
   .flatMap((g) => g.items)
@@ -30,14 +30,13 @@ const untried = (await getTechniquesByCategory())
   <section class="card">
     <h2>研究の蓄積</h2>
     <dl class="exp-list">
-      {experience.map((e) => (
+      {reactionCounts.map((r) => (
         <div class="exp-row">
-          <dt>{e.category}</dt>
-          <dd><StarMeter value={e.exp} /></dd>
+          <dt><span class="reaction">{r.key}</span><small class="reaction-note">{r.note}</small></dt>
+          <dd><StarMeter value={r.count} /></dd>
         </div>
       ))}
-    </dl>
-  </section>
+    </dl>  </section>
 
   {untried.length > 0 && (
     <section class="card suggest">

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Impressions from '../../components/Impressions.astro';
 import { getLogs, formatDate } from '../../lib/stats';
 
 const logs = await getLogs();
@@ -20,11 +21,7 @@ const logs = await getLogs();
           {log.data.techniques.map((t) => <a class="tag" href={`/techniques/${t.id}/`}>{t.id}</a>)}
         </dd>
       </dl>
-      {log.data.impressions.length > 0 && (
-        <ul class="impressions">
-          {log.data.impressions.map((i) => <li>{i}</li>)}
-        </ul>
-      )}
+      <Impressions log={log} />
     </article>
   ))}
 </BaseLayout>

@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { categories } from '../data/categories';
+import { reactions } from '../data/reactions';
 
 export type Technique = CollectionEntry<'techniques'>;
 export type Log = CollectionEntry<'logs'>;
@@ -21,15 +22,13 @@ export async function getTryCounts(): Promise<Map<string, number>> {
   return counts;
 }
 
-/** カテゴリごとの経験値（= そのカテゴリの技法を試した延べ回数） */
-export async function getCategoryExperience() {
-  const techniques = await getCollection('techniques');
-  const counts = await getTryCounts();
-  return categories.map((category) => {
-    const inCategory = techniques.filter((t) => t.data.category === category);
-    const exp = inCategory.reduce((sum, t) => sum + (counts.get(t.id) ?? 0), 0);
-    return { category, exp };
-  });
+/** どやぁ / ぐぬぬ / はて？ ごとの感想の延べ数 */
+export async function getReactionCounts() {
+  const logs = await getCollection('logs');
+  return reactions.map((r) => ({
+    ...r,
+    count: logs.reduce((sum, log) => sum + log.data[r.key].length, 0),
+  }));
 }
 
 /** カテゴリ別に並べた技法一覧（試した回数つき） */

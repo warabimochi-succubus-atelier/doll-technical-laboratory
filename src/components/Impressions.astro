@@ -1,0 +1,27 @@
+---
+// 制作ログの感想を どやぁ / ぐぬぬ / はて？ ごとに表示する
+import type { CollectionEntry } from 'astro:content';
+import { reactions } from '../data/reactions';
+
+interface Props {
+  log: CollectionEntry<'logs'>;
+}
+const { log } = Astro.props;
+const groups = reactions
+  .map((r) => ({ ...r, items: log.data[r.key] }))
+  .filter((g) => g.items.length > 0);
+---
+{groups.length > 0 && (
+  <dl class="impressions">
+    {groups.map((g) => (
+      <div class="impression-group">
+        <dt><span class="reaction">{g.key}</span></dt>
+        <dd>
+          <ul>
+            {g.items.map((i) => <li>{i}</li>)}
+          </ul>
+        </dd>
+      </div>
+    ))}
+  </dl>
+)}
