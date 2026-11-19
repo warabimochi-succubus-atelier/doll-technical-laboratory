@@ -3,6 +3,7 @@
 未経験の技法を試し、その結果を記録するための研究室サイト。Astro 製。
 コンセプトの元メモは [docs/concept.md](docs/concept.md)、運用方針の原文は [docs/policy.md](docs/policy.md)。
 サイト上では「この研究室について」（`src/pages/about.astro`）にこの2つをまとめて掲載しています。
+iPhone から制作ログを投稿するアプリ（開発予定）の仕様は [docs/posting-app-spec.md](docs/posting-app-spec.md)。
 
 ## 開発
 
