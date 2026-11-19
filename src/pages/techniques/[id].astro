@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getLogs, formatDate } from '../../lib/stats';
@@ -27,7 +28,7 @@ const logs = (await getLogs()).filter((log) => log.data.techniques.some((t) => t
       <ul class="log-list">
         {logs.map((log) => (
           <li>
-            <a href={`/logs/${log.id}/`}>
+            <a href={url(`/logs/${log.id}/`)}>
               <time>{formatDate(log.data.date)}</time>
               <span class="log-doll">{log.data.doll}</span>
             </a>
@@ -36,5 +37,5 @@ const logs = (await getLogs()).filter((log) => log.data.techniques.some((t) => t
       </ul>
     )}
   </section>
-  <p class="more"><a href="/techniques/">← 技術リストへ</a></p>
+  <p class="more"><a href={url('/techniques/')}>← 技術リストへ</a></p>
 </BaseLayout>

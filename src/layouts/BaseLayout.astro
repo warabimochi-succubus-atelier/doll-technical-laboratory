@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 import '../styles/global.css';
 
 interface Props {
@@ -23,12 +24,12 @@ const nav = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{pageTitle}</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href={url('/favicon-32.png')} />
+    <link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content={new URL('/images/emblem.webp', Astro.url)} />
+    <meta property="og:image" content={new URL(url('/images/emblem.webp'), Astro.site ?? Astro.url)} />
     <meta name="twitter:card" content="summary" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -39,8 +40,8 @@ const nav = [
   </head>
   <body>
     <header class="site-header">
-      <a href="/" class="site-logo">
-        <img src="/images/icon.webp" alt="" width="44" height="44" />
+      <a href={url('/')} class="site-logo">
+        <img src={url('/images/icon.webp')} alt="" width="44" height="44" />
         <span class="site-logo-text">
           <span class="site-logo-sub">わらびもちサキュバス工房</span>
           {siteName}
@@ -48,7 +49,7 @@ const nav = [
       </a>
       <nav>
         {nav.map((n) => (
-          <a href={n.href} aria-current={(n.href === '/' ? path === '/' : path.startsWith(n.href)) ? 'page' : undefined}>
+          <a href={url(n.href)} aria-current={(n.href === '/' ? path === url('/') : path.startsWith(url(n.href))) ? 'page' : undefined}>
             {n.label}
           </a>
         ))}

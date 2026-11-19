@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 // 制作ログ一覧の1ページ分（/logs/ と /logs/page/n/ で共通）
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Impressions from './Impressions.astro';
@@ -23,12 +24,12 @@ const pages = Array.from({ length: total }, (_, i) => i + 1);
 
   {logs.map((log) => (
     <article class="card log-card">
-      <h2><a href={`/logs/${log.id}/`}>{formatDate(log.data.date)}</a></h2>
+      <h2><a href={url(`/logs/${log.id}/`)}>{formatDate(log.data.date)}</a></h2>
       <dl class="log-meta">
         <dt>対象</dt><dd>{log.data.doll}</dd>
         <dt>試した技術</dt>
         <dd>
-          {log.data.techniques.map((t) => <a class="tag" href={`/techniques/${t.id}/`}>{t.id}</a>)}
+          {log.data.techniques.map((t) => <a class="tag" href={url(`/techniques/${t.id}/`)}>{t.id}</a>)}
         </dd>
       </dl>
       <Impressions log={log} />

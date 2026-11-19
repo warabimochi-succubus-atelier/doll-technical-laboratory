@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StarMeter from '../components/StarMeter.astro';
 import { getReactionCounts, getLogs, getTechniquesByCategory, formatDate } from '../lib/stats';
@@ -12,11 +13,11 @@ const untried = (await getTechniquesByCategory())
 ---
 <BaseLayout>
   <section class="hero">
-    <img src="/images/top.webp" alt="どーる技術研究室 — Doll Technical Laboratory" />
+    <img src={url('/images/top.webp')} alt="どーる技術研究室 — Doll Technical Laboratory" />
   </section>
 
   <section class="card concept">
-    <img class="concept-emblem" src="/images/emblem.webp" alt="" width="200" height="200" loading="lazy" />
+    <img class="concept-emblem" src={url('/images/emblem.webp')} alt="" width="200" height="200" loading="lazy" />
     <h1>どーる技術研究室</h1>
     <p class="lead">ドールメイクに正解はない。だから、研究する。</p>
     <p>未経験の技法を試し、その結果を記録するための研究室。</p>
@@ -36,25 +37,26 @@ const untried = (await getTechniquesByCategory())
           <dd><StarMeter value={r.count} /></dd>
         </div>
       ))}
-    </dl>  </section>
+    </dl>
+  </section>
 
   {untried.length > 0 && (
     <section class="card suggest">
-      <img class="suggest-mascot" src="/images/mascot.webp" alt="" width="180" height="180" loading="lazy" />
+      <img class="suggest-mascot" src={url('/images/mascot.webp')} alt="" width="180" height="180" loading="lazy" />
       <div class="suggest-body">
         <h2>今日はこれを試してみる？</h2>
         <p class="suggest-pick" id="suggest-pick">
-          <a href={`/techniques/${untried[0].id}/`}>
+          <a href={url(`/techniques/${untried[0].id}/`)}>
             <span class="tag">{untried[0].category}</span>{untried[0].name}
           </a>
         </p>
         <button type="button" id="suggest-reroll">ほかの技法にする</button>
       </div>
-      <script is:inline define:vars={{ untried }}>
+      <script is:inline define:vars={{ untried, techniquesBase: url('/techniques/') }}>
         const el = document.getElementById('suggest-pick');
         const pick = () => {
           const t = untried[Math.floor(Math.random() * untried.length)];
-          el.innerHTML = `<a href="/techniques/${encodeURIComponent(t.id)}/"><span class="tag">${t.category}</span>${t.name}</a>`;
+          el.innerHTML = `<a href="${techniquesBase}${encodeURIComponent(t.id)}/"><span class="tag">${t.category}</span>${t.name}</a>`;
         };
         pick();
         document.getElementById('suggest-reroll').addEventListener('click', pick);
@@ -67,7 +69,7 @@ const untried = (await getTechniquesByCategory())
     <ul class="log-list">
       {recentLogs.map((log) => (
         <li>
-          <a href={`/logs/${log.id}/`}>
+          <a href={url(`/logs/${log.id}/`)}>
             <time>{formatDate(log.data.date)}</time>
             <span class="log-doll">{log.data.doll}</span>
             <span class="log-techs">{log.data.techniques.map((t) => t.id).join('・')}</span>
@@ -75,6 +77,6 @@ const untried = (await getTechniquesByCategory())
         </li>
       ))}
     </ul>
-    <p class="more"><a href="/logs/">すべてのログ →</a></p>
+    <p class="more"><a href={url('/logs/')}>すべてのログ →</a></p>
   </section>
 </BaseLayout>

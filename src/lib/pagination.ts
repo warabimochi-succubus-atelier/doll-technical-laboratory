@@ -1,9 +1,11 @@
 // 制作ログ一覧のページ切り替え
+import { url } from './url';
+
 export const LOGS_PER_PAGE = 10;
 
 /** n ページ目の URL（1ページ目は /logs/、2ページ目以降は /logs/page/n/） */
 export function logsPageUrl(n: number) {
-  return n === 1 ? '/logs/' : `/logs/page/${n}/`;
+  return url(n === 1 ? '/logs/' : `/logs/page/${n}/`);
 }
 
 /** 全件を1ページあたり LOGS_PER_PAGE 件ずつに分ける */

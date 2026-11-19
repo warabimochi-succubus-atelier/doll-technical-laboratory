@@ -7,13 +7,21 @@ iPhone から制作ログを投稿するアプリ（開発予定）の仕様は 
 
 ## 開発
 
-Node.js 18.20 以上が必要です。
+Node.js 22.23.4 以上が必要です（Astro 7 の要件）。
 
 ```sh
 npm install
-npm run dev     # http://localhost:4321
+npm run dev     # http://localhost:4321/doll-technical-laboratory/
 npm run build   # dist/ に静的サイトを出力
 ```
+
+## 公開
+
+`main` に push すると、GitHub Actions（`.github/workflows/deploy.yml`）がビルドして GitHub Pages に公開します。
+
+- 公開URL：https://warabimochi-succubus-atelier.github.io/doll-technical-laboratory/
+- サイトはこの `/doll-technical-laboratory/` の下に置かれるため、ページ内のリンクや画像は
+  `href="/logs/"` と直接書かず、`src/lib/url.ts` の `url('/logs/')` を通して書きます。
 
 ## コンテンツの追加
 

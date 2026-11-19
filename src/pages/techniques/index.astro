@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getTechniquesByCategory } from '../../lib/stats';
 
@@ -19,7 +20,7 @@ const groups = await getTechniquesByCategory();
         <ul class="tech-list">
           {g.items.map(({ entry, count }) => (
             <li class={count > 0 ? 'tried' : ''}>
-              <a href={`/techniques/${entry.id}/`}>
+              <a href={url(`/techniques/${entry.id}/`)}>
                 <span class="check" aria-hidden="true">{count > 0 ? '☑' : '☐'}</span>
                 {entry.data.name}
                 {count > 0 && <span class="count">{count}回</span>}

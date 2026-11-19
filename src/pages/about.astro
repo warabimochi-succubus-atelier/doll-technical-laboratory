@@ -1,4 +1,5 @@
 ---
+import { url } from '../lib/url';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { reactions } from '../data/reactions';
 // 文言は docs/concept.md と docs/policy.md（運用方針の原文）を短くまとめたもの
@@ -26,7 +27,7 @@ const fields = [
 ---
 <BaseLayout title="この研究室について">
   <section class="about-visual">
-    <img src="/images/about.webp" alt="ドールの道具に囲まれた研究室の様子" />
+    <img src={url('/images/about.webp')} alt="ドールの道具に囲まれた研究室の様子" />
   </section>
 
   <section class="card">
@@ -58,9 +59,9 @@ const fields = [
   <section class="card">
     <h2>研究の進め方</h2>
     <p>
-      制作のたびに<strong>「今日はどの技法を試してみるか」</strong>を意識して取り組み、<a href="/logs/">制作ログ</a>に残します。
+      制作のたびに<strong>「今日はどの技法を試してみるか」</strong>を意識して取り組み、<a href={url('/logs/')}>制作ログ</a>に残します。
       感想は どやぁ／ぐぬぬ／はて？ に分けて書き、トップページの★として積み上がります。
-      試した技法には<a href="/techniques/">技術リスト</a>でチェックが付きます。
+      試した技法には<a href={url('/techniques/')}>技術リスト</a>でチェックが付きます。
     </p>
     <p>
       更新頻度は決めていません。まとめておきたいテーマが出てきたら、研究メモとして記事にします。
