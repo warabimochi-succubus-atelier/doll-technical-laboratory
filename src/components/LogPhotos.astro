@@ -1,0 +1,79 @@
+---
+// 制作ログの写真ギャラリー。全部同じ大きさの正方形で格子状に並べ、タップで拡大表示する
+import { getLogPhotos, type Log } from '../lib/stats';
+
+interface Props {
+  log: Log;
+}
+const { log } = Astro.props;
+const photos = getLogPhotos(log);
+---
+{photos.length > 0 && (
+  <div class="photo-gallery" data-photo-gallery>
+    <ul class="photo-grid">
+      {photos.map((p, i) => (
+        <li>
+          <button type="button" class="photo-thumb" data-index={i} aria-label={`${p.alt}を拡大`}>
+            <img src={p.src} alt={p.alt} loading="lazy" decoding="async" />
+          </button>
+        </li>
+      ))}
+    </ul>
+
+    <dialog class="lightbox" aria-label="写真の拡大表示">
+      <img class="lightbox-img" src="" alt="" />
+      <p class="lightbox-count" aria-live="polite"></p>
+      <button type="button" class="lightbox-close" data-close aria-label="閉じる">×</button>
+      {photos.length > 1 && (
+        <>
+          <button type="button" class="lightbox-nav lightbox-prev" data-step="-1" aria-label="前の写真">‹</button>
+          <button type="button" class="lightbox-nav lightbox-next" data-step="1" aria-label="次の写真">›</button>
+        </>
+      )}
+    </dialog>
+  </div>
+)}
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-photo-gallery]').forEach((gallery) => {
+    const thumbs = [...gallery.querySelectorAll<HTMLImageElement>('.photo-thumb img')];
+    const dialog = gallery.querySelector<HTMLDialogElement>('.lightbox')!;
+    const img = dialog.querySelector<HTMLImageElement>('.lightbox-img')!;
+    const count = dialog.querySelector<HTMLElement>('.lightbox-count')!;
+    let current = 0;
+
+    const show = (i: number) => {
+      current = (i + thumbs.length) % thumbs.length;
+      img.src = thumbs[current].src;
+      img.alt = thumbs[current].alt;
+      count.textContent = `${current + 1} / ${thumbs.length}`;
+    };
+
+    gallery.querySelectorAll<HTMLButtonElement>('.photo-thumb').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        show(Number(btn.dataset.index));
+        dialog.showModal();
+      });
+    });
+    dialog.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((btn) => {
+      btn.addEventListener('click', () => show(current + Number(btn.dataset.step)));
+    });
+    dialog.querySelector('[data-close]')!.addEventListener('click', () => dialog.close());
+    // 写真の外側（背景）をタップしたら閉じる
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('keydown', (e) => {
+      if (thumbs.length < 2) return;
+      if (e.key === 'ArrowLeft') show(current - 1);
+      if (e.key === 'ArrowRight') show(current + 1);
+    });
+    // 左右スワイプで前後の写真へ
+    let startX = 0;
+    dialog.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
+    dialog.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - startX;
+      if (thumbs.length > 1 && Math.abs(dx) > 50) show(current + (dx < 0 ? 1 : -1));
+    });
+  });
+</script>

@@ -3,6 +3,7 @@ import { url } from '../../lib/url';
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Impressions from '../../components/Impressions.astro';
+import LogPhotos from '../../components/LogPhotos.astro';
 import { formatDate } from '../../lib/stats';
 
 export async function getStaticPaths() {
@@ -18,6 +19,8 @@ const date = formatDate(entry.data.date);
   <article class="card">
     <p class="muted"><time>{date}</time></p>
     <h1>{entry.data.doll}</h1>
+
+    <LogPhotos log={entry} />
 
     <h2>試した技術</h2>
     <p>{entry.data.techniques.map((t) => <a class="tag" href={url(`/techniques/${t.id}/`)}>{t.id}</a>)}</p>

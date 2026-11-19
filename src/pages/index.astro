@@ -2,7 +2,7 @@
 import { url } from '../lib/url';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StarMeter from '../components/StarMeter.astro';
-import { getReactionCounts, getLogs, getTechniquesByCategory, formatDate } from '../lib/stats';
+import { getReactionCounts, getLogs, getLogPhotos, getTechniquesByCategory, formatDate } from '../lib/stats';
 
 const reactionCounts = await getReactionCounts();
 const recentLogs = (await getLogs()).slice(0, 3);
@@ -70,6 +70,12 @@ const untried = (await getTechniquesByCategory())
       {recentLogs.map((log) => (
         <li>
           <a href={url(`/logs/${log.id}/`)}>
+            {(() => {
+              const first = getLogPhotos(log)[0];
+              return first
+                ? <span class="log-thumb log-thumb-sm"><img src={first.src} alt="" loading="lazy" decoding="async" /></span>
+                : <span class="log-thumb log-thumb-sm log-thumb-empty" aria-hidden="true"></span>;
+            })()}
             <time>{formatDate(log.data.date)}</time>
             <span class="log-doll">{log.data.doll}</span>
             <span class="log-techs">{log.data.techniques.map((t) => t.id).join('・')}</span>

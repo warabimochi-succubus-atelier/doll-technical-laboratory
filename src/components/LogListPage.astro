@@ -3,7 +3,7 @@ import { url } from '../lib/url';
 // 制作ログ一覧の1ページ分（/logs/ と /logs/page/n/ で共通）
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Impressions from './Impressions.astro';
-import { formatDate, type Log } from '../lib/stats';
+import { formatDate, getLogPhotos, type Log } from '../lib/stats';
 import { logsPageUrl } from '../lib/pagination';
 
 interface Props {
@@ -22,19 +22,34 @@ const pages = Array.from({ length: total }, (_, i) => i + 1);
     <p class="muted">全{count}件{total > 1 && `・${current} / ${total}ページ`}</p>
   </section>
 
-  {logs.map((log) => (
-    <article class="card log-card">
-      <h2><a href={url(`/logs/${log.id}/`)}>{formatDate(log.data.date)}</a></h2>
-      <dl class="log-meta">
-        <dt>対象</dt><dd>{log.data.doll}</dd>
-        <dt>試した技術</dt>
-        <dd>
-          {log.data.techniques.map((t) => <a class="tag" href={url(`/techniques/${t.id}/`)}>{t.id}</a>)}
-        </dd>
-      </dl>
-      <Impressions log={log} />
-    </article>
-  ))}
+  {logs.map((log) => {
+    const photos = getLogPhotos(log);
+    return (
+      <article class="card log-card">
+        <div class="log-card-body">
+          {photos.length > 0 && (
+            <a class="log-thumb" href={url(`/logs/${log.id}/`)} tabindex="-1" aria-hidden="true">
+              <img src={photos[0].src} alt="" loading="lazy" decoding="async" />
+            </a>
+          )}
+          <div class="log-card-main">
+            <h2>
+              <a href={url(`/logs/${log.id}/`)}>{formatDate(log.data.date)}</a>
+              {photos.length > 0 && <span class="photo-count">写真{photos.length}枚</span>}
+            </h2>
+            <dl class="log-meta">
+              <dt>対象</dt><dd>{log.data.doll}</dd>
+              <dt>試した技術</dt>
+              <dd>
+                {log.data.techniques.map((t) => <a class="tag" href={url(`/techniques/${t.id}/`)}>{t.id}</a>)}
+              </dd>
+            </dl>
+            <Impressions log={log} />
+          </div>
+        </div>
+      </article>
+    );
+  })}
 
   {total > 1 && (
     <nav class="pager" aria-label="ページ切り替え">

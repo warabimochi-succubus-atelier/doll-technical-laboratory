@@ -1,6 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { categories } from '../data/categories';
 import { reactions } from '../data/reactions';
+import { url } from './url';
 
 export type Technique = CollectionEntry<'techniques'>;
 export type Log = CollectionEntry<'logs'>;
@@ -41,6 +42,15 @@ export async function getTechniquesByCategory() {
       .filter((t) => t.data.category === category)
       .sort((a, b) => a.data.order - b.data.order)
       .map((t) => ({ entry: t, count: counts.get(t.id) ?? 0 })),
+  }));
+}
+
+/** ログの写真（URL と説明文）。説明文は「ドール名 日付 写真N」で自動生成する */
+export function getLogPhotos(log: Log) {
+  const date = formatDate(log.data.date);
+  return log.data.photos.map((name, i) => ({
+    src: url(`/images/logs/${name}`),
+    alt: `${log.data.doll} ${date} 写真${i + 1}`,
   }));
 }
 
