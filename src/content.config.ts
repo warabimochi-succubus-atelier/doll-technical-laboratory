@@ -3,7 +3,7 @@ import { glob } from 'astro/loaders';
 import { existsSync } from 'node:fs';
 import { categories } from './data/categories';
 
-// 試したい技法（ファイル名がそのまま技法IDになる 例: 平行眉.md）
+// 試したい技法（ファイル名がそのまま技法IDになる 例: 細い線.md）
 const techniques = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/techniques' }),
   schema: z.object({
