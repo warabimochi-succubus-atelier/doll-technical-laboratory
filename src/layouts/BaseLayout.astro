@@ -7,7 +7,7 @@ interface Props {
   description?: string;
 }
 const siteName = 'どーる技術研究室';
-const { title, description = '未経験の技法を試し、その結果を記録するための研究室。' } = Astro.props;
+const { title, description = '技法を試し、その結果を記録するための研究室。' } = Astro.props;
 const pageTitle = title ? `${title} | ${siteName}` : siteName;
 const path = Astro.url.pathname;
 const nav = [

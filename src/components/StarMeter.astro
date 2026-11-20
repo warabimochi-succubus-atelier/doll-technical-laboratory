@@ -1,12 +1,12 @@
 ---
-// 経験値を★で表示する。分母（最大値）は表示しない。
+// 件数（どやぁ／ぐぬぬ／はて？の延べ数など）を★で表示する。分母（最大値）は表示しない。
 interface Props {
   value: number;
 }
 const { value } = Astro.props;
 const MAX_STARS = 10; // これを超えたら「★×N」表記にする
 ---
-<span class="stars" aria-label={`経験値 ${value}`}>
+<span class="stars" aria-label={`${value}件`}>
   {value === 0 && <span class="stars-empty">まだこれから</span>}
   {value > 0 && value <= MAX_STARS && '★'.repeat(value)}
   {value > MAX_STARS && <>★<small>×{value}</small></>}

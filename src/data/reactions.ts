@@ -4,5 +4,3 @@ export const reactions = [
   { key: 'ぐぬぬ', note: '苦戦' },
   { key: 'はて？', note: '疑問' },
 ] as const;
-
-export type Reaction = (typeof reactions)[number]['key'];

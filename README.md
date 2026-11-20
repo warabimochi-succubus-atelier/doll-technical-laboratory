@@ -1,6 +1,6 @@
 # どーる技術研究室 (doll-technical-laboratory)
 
-未経験の技法を試し、その結果を記録するための研究室サイト。Astro 製。
+技法を試し、その結果を記録するための研究室サイト。Astro 製。
 コンセプトの元メモは [docs/concept.md](docs/concept.md)、運用方針の原文は [docs/policy.md](docs/policy.md)。
 サイト上では「この研究室について」（`src/pages/about.astro`）にこの2つをまとめて掲載しています。
 iPhone から制作ログを投稿するアプリの仕様は [docs/posting-app-spec.md](docs/posting-app-spec.md)。
@@ -123,4 +123,6 @@ techniques:          # techniques/ のファイル名（拡張子なし）
 | `/techniques/` | 技術リスト（研究分野・カテゴリ別のチェックリスト、技法ごとの試した回数） |
 | `/techniques/<技法>/` | 技法の詳細と、それを試したログ |
 | `/logs/` | 制作ログ一覧（新しい順に10件ずつ。2ページ目以降は `/logs/page/2/` など。件数は `src/lib/pagination.ts` で変更） |
-| `/logs/<日付>/` | ログ詳細 |
+| `/logs/<日付>/` | ログ詳細（写真ギャラリー・感想） |
+| `/about/` | この研究室について（研究理念・研究の進め方・研究分野） |
+| `/post/` | 投稿アプリ（ナビゲーションには出さない。ホーム画面に追加して使う） |
