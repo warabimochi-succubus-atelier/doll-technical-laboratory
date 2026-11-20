@@ -44,6 +44,8 @@ https://warabimochi-succubus-atelier.github.io/doll-technical-laboratory/post/
 3. 共有ボタン →「ホーム画面に追加」すると、アプリのように全画面で使える
 
 投稿すると、写真（長辺1600px・JPEG・位置情報なし）とログが 1 コミットで `main` に追加され、数分でサイトに反映されます。
+「過去の投稿」から、投稿済みのログを編集・削除できます（写真の追加・削除も可。削除しても Git の履歴には残ります）。
+手元でも作業する場合は、アプリで投稿・編集したあと `git pull` で取り込んでから作業してください。
 トークンは端末のブラウザ内にだけ保存され、GitHub API 以外には送られません。
 コードは `src/pages/post/` と `src/lib/post/`。
 

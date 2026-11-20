@@ -53,7 +53,23 @@ const siteUrl = new URL(url('/'), Astro.site).href;
         はじめに<button type="button" class="post-link-btn" data-open-settings>設定</button>から GitHub のトークンを入力してください。
       </p>
 
+      <nav class="post-tabs" aria-label="画面の切り替え">
+        <button type="button" class="post-tab" id="tab-new" aria-pressed="true">投稿する</button>
+        <button type="button" class="post-tab" id="tab-past" aria-pressed="false">過去の投稿</button>
+      </nav>
+
+      <section id="past-view" hidden>
+        <p class="post-note">新しい順に表示します。投稿した直後の、サイトにまだ反映されていないログも出ます。</p>
+        <p class="post-error" id="past-error" role="alert" hidden></p>
+        <ul class="post-past-list" id="past-list"></ul>
+        <button type="button" class="post-btn post-more" id="past-more" hidden>もっと見る</button>
+      </section>
+
       <form id="post-form" novalidate>
+        <p class="post-editing" id="editing-banner" hidden>
+          <span id="editing-label"></span>
+          <button type="button" class="post-link-btn" id="cancel-edit">編集をやめる</button>
+        </p>
         <section class="card">
           <label class="post-photo-add">
             <input type="file" id="photo-input" accept="image/*" multiple />
@@ -123,6 +139,7 @@ const siteUrl = new URL(url('/'), Astro.site).href;
           </label>
           <p class="post-error" id="form-error" role="alert" hidden></p>
           <button type="submit" class="post-submit" id="submit">投稿</button>
+          <button type="button" class="post-delete" id="delete-log" hidden>このログを削除</button>
           <p class="post-status" id="status" role="status" aria-live="polite"></p>
         </section>
       </form>

@@ -55,20 +55,43 @@ export async function fileExists(repo: string, token: string, path: string) {
   }
 }
 
-export interface NewFile {
-  path: string;
-  base64: string;
+/** フォルダ内のファイル名一覧（main の最新） */
+export async function listDir(repo: string, token: string, path: string) {
+  try {
+    const items = await gh<{ name: string; type: string }[]>(token, `/repos/${repo}/contents/${encodePath(path)}?ref=${BRANCH}`);
+    return items.filter((i) => i.type === 'file').map((i) => i.name);
+  } catch (e) {
+    if (e instanceof GitHubError && e.status === 404) return [];
+    throw e;
+  }
 }
+
+/** ファイルの中身を base64 で取る（1MB 以下のファイル向け） */
+export async function getFileBase64(repo: string, token: string, path: string) {
+  const f = await gh<{ content: string; encoding: string }>(token, `/repos/${repo}/contents/${encodePath(path)}?ref=${BRANCH}`);
+  return f.content.replace(/\n/g, '');
+}
+
+export const base64ToBytes = (b64: string) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+
+export async function getTextFile(repo: string, token: string, path: string) {
+  return new TextDecoder().decode(base64ToBytes(await getFileBase64(repo, token, path)));
+}
+
+/** 追加・上書きするファイル（base64）と、削除するファイル（delete: true） */
+export type NewFile = { path: string; base64: string } | { path: string; delete: true };
 
 /** files をまとめて 1 コミットにして main を進める。main が先に進んでいたら 1 回だけやり直す */
 export async function commitFiles(repo: string, token: string, files: NewFile[], message: string) {
-  const blobs = [];
+  const blobs: ({ sha: string } | null)[] = [];
   for (const f of files) {
     blobs.push(
-      await gh<{ sha: string }>(token, `/repos/${repo}/git/blobs`, {
-        method: 'POST',
-        body: { content: f.base64, encoding: 'base64' },
-      }),
+      'delete' in f
+        ? null
+        : await gh<{ sha: string }>(token, `/repos/${repo}/git/blobs`, {
+            method: 'POST',
+            body: { content: f.base64, encoding: 'base64' },
+          }),
     );
   }
 
@@ -80,7 +103,8 @@ export async function commitFiles(repo: string, token: string, files: NewFile[],
       method: 'POST',
       body: {
         base_tree: parentCommit.tree.sha,
-        tree: files.map((f, i) => ({ path: f.path, mode: '100644', type: 'blob', sha: blobs[i].sha })),
+        // sha: null はそのファイルの削除
+        tree: files.map((f, i) => ({ path: f.path, mode: '100644', type: 'blob', sha: blobs[i]?.sha ?? null })),
       },
     });
     const commit = await gh<{ sha: string }>(token, `/repos/${repo}/git/commits`, {
