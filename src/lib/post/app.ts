@@ -15,6 +15,7 @@ import { blobToBase64, resizeToJpeg, textToBase64 } from './image';
 import { buildLogMarkdown, nowInJapan, parseLogMarkdown, splitLines, type LogInput } from './markdown';
 import { clearSettings, loadSettings, saveSettings, type Settings } from './storage';
 import { initTechniqueView } from './techview';
+import type { Field } from './categories';
 
 export const DEFAULT_REPO = 'warabimochi-succubus-atelier/doll-technical-laboratory';
 const MAX_PHOTOS = 5;
@@ -75,8 +76,9 @@ export function initPostApp() {
   const pastView = $('past-view');
   const tabTech = $<HTMLButtonElement>('tab-tech');
   const techView = $('tech-view');
-  const categories: string[] = JSON.parse(document.body.dataset.categories ?? '[]');
-  const researchFields: { name: string; categories: string[] }[] = JSON.parse(document.body.dataset.fields ?? '[]');
+  // 研究分野とカテゴリ（最初はビルド時に埋め込んだもの。技術リストタブで GitHub から読み直すと差し替わる）
+  let researchFields: Field[] = JSON.parse(document.body.dataset.fields ?? '[]');
+  let categories = researchFields.flatMap((f) => f.categories);
   const pastList = $<HTMLUListElement>('past-list');
   const pastMore = $<HTMLButtonElement>('past-more');
   const pastError = $('past-error');
@@ -257,11 +259,12 @@ export function initPostApp() {
 
   // ---- 画面の切り替え ----
   const showTechniques = initTechniqueView({
-    categories,
     fields: researchFields,
     needSettings,
     describeError,
-    onChanged: (list) => {
+    onChanged: (list, fields) => {
+      researchFields = fields;
+      categories = fields.flatMap((f) => f.categories);
       currentTechniques = list;
       renderChips(list);
     },

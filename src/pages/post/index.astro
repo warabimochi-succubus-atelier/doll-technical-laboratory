@@ -42,7 +42,7 @@ const siteUrl = new URL(url('/'), Astro.site).href;
       rel="stylesheet"
     />
   </head>
-  <body class="post-app" data-site-url={siteUrl} data-categories={JSON.stringify(categories)} data-fields={JSON.stringify(fields)}>
+  <body class="post-app" data-site-url={siteUrl} data-fields={JSON.stringify(fields)}>
     <header class="post-header">
       <h1>制作ログを投稿</h1>
       <button type="button" class="post-icon-btn" id="open-settings" aria-label="設定">⚙</button>
@@ -60,11 +60,13 @@ const siteUrl = new URL(url('/'), Astro.site).href;
       </nav>
 
       <section id="tech-view" hidden>
-        <p class="post-note">技法の追加・名前の変更・並べ替え・削除ができます。名前を変えると、その技法を使っている制作ログも自動で書き換えます。</p>
+        <p class="post-note" id="tech-intro">技法の追加・名前の変更・並べ替え・削除ができます。名前を変えると、その技法を使っている制作ログも自動で書き換えます。</p>
+        <button type="button" class="post-btn post-mode-btn" id="tech-mode">カテゴリ・研究分野を編集</button>
         <p class="post-error" id="tech-error" role="alert" hidden></p>
         <p class="post-status" id="tech-status" role="status" aria-live="polite"></p>
         <div id="tech-list"></div>
         <button type="button" class="post-btn post-more" id="tech-add">＋ 技法を追加</button>
+        <button type="button" class="post-btn post-more" id="field-add" hidden>＋ 研究分野を追加</button>
       </section>
 
       <section id="past-view" hidden>
@@ -208,6 +210,28 @@ const siteUrl = new URL(url('/'), Astro.site).href;
           <span class="post-spacer"></span>
           <button type="button" class="post-btn" id="tech-cancel">閉じる</button>
           <button type="submit" class="post-btn post-btn-primary" id="tech-save">保存</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="post-settings" id="cat-dialog">
+      <form method="dialog" id="cat-form" novalidate>
+        <h2 id="cat-dialog-title">カテゴリを追加</h2>
+        <label class="post-field">
+          <span>カテゴリ名</span>
+          <input type="text" id="cat-name" autocomplete="off" placeholder="ウィッグ" />
+        </label>
+        <label class="post-field">
+          <span>研究分野</span>
+          <select id="cat-field"></select>
+        </label>
+        <p class="post-note" id="cat-rename-note" hidden>カテゴリ名を変えると、このカテゴリの技法ファイルもまとめて書き換えます。</p>
+        <p class="post-error" id="cat-dialog-error" role="alert" hidden></p>
+        <div class="post-settings-actions">
+          <button type="button" class="post-link-btn post-danger-link" id="cat-delete">このカテゴリを削除</button>
+          <span class="post-spacer"></span>
+          <button type="button" class="post-btn" id="cat-cancel">閉じる</button>
+          <button type="submit" class="post-btn post-btn-primary" id="cat-save">保存</button>
         </div>
       </form>
     </dialog>
