@@ -50,12 +50,12 @@ function scalar(raw: string): string {
 }
 
 /**
- * 制作ログを読み取って入力欄に戻せる形にする。
- * このサイトのログで使う書き方（「キー: 値」と「キー:」＋「  - 項目」）だけを読む。
+ * Markdown の先頭の設定部分（--- で囲まれた YAML）と本文を読む。
+ * このサイトのファイルで使う書き方（「キー: 値」と「キー:」＋「  - 項目」）だけを読む。
  */
-export function parseLogMarkdown(text: string): LogInput {
+function parseFrontmatter(text: string) {
   const m = text.replace(/^﻿/, '').match(/^---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n([\s\S]*))?$/);
-  if (!m) throw new Error('ログの形式を読み取れませんでした。');
+  if (!m) throw new Error('ファイルの形式を読み取れませんでした。');
   const data: Record<string, string | string[]> = {};
   let key: string | null = null;
   for (const line of m[1].split(/\r?\n/)) {
@@ -72,8 +72,16 @@ export function parseLogMarkdown(text: string): LogInput {
       data[key] = value === '' ? [] : scalar(value);
     }
   }
-  const arr = (k: string) => (Array.isArray(data[k]) ? (data[k] as string[]) : []);
-  const str = (k: string) => (typeof data[k] === 'string' ? (data[k] as string) : '');
+  return {
+    arr: (k: string) => (Array.isArray(data[k]) ? (data[k] as string[]) : []),
+    str: (k: string) => (typeof data[k] === 'string' ? (data[k] as string) : ''),
+    body: m[2] ?? '',
+  };
+}
+
+/** 制作ログを読み取って入力欄に戻せる形にする */
+export function parseLogMarkdown(text: string): LogInput {
+  const { arr, str, body } = parseFrontmatter(text);
   return {
     date: str('date'),
     doll: str('doll'),
@@ -82,8 +90,45 @@ export function parseLogMarkdown(text: string): LogInput {
     doya: arr('どやぁ'),
     gunu: arr('ぐぬぬ'),
     hate: arr('はて？'),
-    memo: (m[2] ?? '').trim(),
+    memo: body.trim(),
   };
+}
+
+// ---- 技術リスト（src/content/techniques/<技法名>.md） ----
+
+export interface TechniqueInput {
+  name: string; // ファイル名（＝技法 ID）と同じ
+  category: string;
+  order: number;
+  memo: string;
+}
+
+// 手書きで作った技法ファイルに入っている、中身のないメモ欄
+const MEMO_PLACEHOLDER = '<!-- この技法についてのメモ・参考資料など -->';
+
+export function parseTechniqueMarkdown(text: string): TechniqueInput {
+  const { str, body } = parseFrontmatter(text);
+  const memo = body.trim();
+  return {
+    name: str('name'),
+    category: str('category'),
+    order: Number(str('order')) || 0,
+    memo: memo === MEMO_PLACEHOLDER ? '' : memo,
+  };
+}
+
+export function buildTechniqueMarkdown(t: TechniqueInput): string {
+  const head = ['---', `name: ${quote(t.name)}`, `category: ${quote(t.category)}`, `order: ${t.order}`, '---', ''];
+  const memo = t.memo.trim();
+  return [...head, ...(memo ? ['', memo, ''] : [])].join('\n');
+}
+
+/** 技法名として使えるか（ファイル名・URL になるため）。問題があれば理由を返す */
+export function techniqueNameProblem(name: string): string {
+  if (!name) return '技法名を入力してください。';
+  if (name.length > 40) return '技法名は40文字以内にしてください。';
+  if (/[\\/:*?"<>|#%]/.test(name) || name.startsWith('.')) return '技法名に \\ / : * ? " < > | # % は使えません（先頭の . も不可）。';
+  return '';
 }
 
 /** 複数行の入力を「1行＝1項目」に分ける（空行は捨てる） */

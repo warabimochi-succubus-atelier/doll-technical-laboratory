@@ -14,6 +14,7 @@ import {
 import { blobToBase64, resizeToJpeg, textToBase64 } from './image';
 import { buildLogMarkdown, nowInJapan, parseLogMarkdown, splitLines, type LogInput } from './markdown';
 import { clearSettings, loadSettings, saveSettings, type Settings } from './storage';
+import { initTechniqueView } from './techview';
 
 export const DEFAULT_REPO = 'warabimochi-succubus-atelier/doll-technical-laboratory';
 const MAX_PHOTOS = 5;
@@ -72,6 +73,9 @@ export function initPostApp() {
   const tabNew = $<HTMLButtonElement>('tab-new');
   const tabPast = $<HTMLButtonElement>('tab-past');
   const pastView = $('past-view');
+  const tabTech = $<HTMLButtonElement>('tab-tech');
+  const techView = $('tech-view');
+  const categories: string[] = JSON.parse(document.body.dataset.categories ?? '[]');
   const pastList = $<HTMLUListElement>('past-list');
   const pastMore = $<HTMLButtonElement>('past-more');
   const pastError = $('past-error');
@@ -190,13 +194,50 @@ export function initPostApp() {
     showError(formError, '');
   };
 
+  // ---- 技法ボタン（技術リストを編集したら作り直す） ----
+  const chipsBox = $('technique-chips');
+  const chip = (id: string, name: string, checked: boolean) => {
+    const label = Object.assign(document.createElement('label'), { className: 'post-chip' });
+    const input = Object.assign(document.createElement('input'), { type: 'checkbox', name: 'technique', value: id, checked });
+    label.append(input, Object.assign(document.createElement('span'), { textContent: name }));
+    return label;
+  };
+  const renderChips = (list: { id: string; name: string; category: string }[], extraChecked: string[] = []) => {
+    const checked = new Set([
+      ...[...chipsBox.querySelectorAll<HTMLInputElement>('input[name="technique"]:checked')].map((c) => c.value),
+      ...extraChecked,
+    ]);
+    const groups = categories
+      .map((c) => ({ category: c, items: list.filter((t) => t.category === c) }))
+      .filter((g) => g.items.length);
+    // 技術リストにない技法がログに入っているとき（削除・改名の直後など）も外れないように残す
+    const known = new Set(list.map((t) => t.id));
+    const orphans = [...checked].filter((id) => !known.has(id));
+    if (orphans.length) groups.push({ category: 'リストにない技法', items: orphans.map((id) => ({ id, name: id, category: '' })) });
+    chipsBox.replaceChildren(
+      Object.assign(document.createElement('legend'), { textContent: '試した技法' }),
+      ...groups.map((g) => {
+        const div = Object.assign(document.createElement('div'), { className: 'post-tech-group' });
+        const chips = Object.assign(document.createElement('div'), { className: 'post-chips' });
+        chips.append(...g.items.map((t) => chip(t.id, t.name, checked.has(t.id))));
+        div.append(Object.assign(document.createElement('p'), { className: 'post-tech-category', textContent: g.category }), chips);
+        return div;
+      }),
+    );
+  };
+  // 最初はビルド時に埋め込んだ一覧を使う
+  let currentTechniques = [...chipsBox.querySelectorAll<HTMLInputElement>('input[name="technique"]')].map((c) => ({
+    id: c.value,
+    name: c.nextElementSibling?.textContent ?? c.value,
+    category: c.closest('.post-tech-group')?.querySelector('.post-tech-category')?.textContent ?? '',
+  }));
+
   const fillForm = (log: LogInput) => {
     form.reset();
     doll.value = log.doll;
     date.value = log.date;
-    form.querySelectorAll<HTMLInputElement>('input[name="technique"]').forEach((c) => {
-      c.checked = log.techniques.includes(c.value);
-    });
+    chipsBox.querySelectorAll<HTMLInputElement>('input[name="technique"]').forEach((c) => (c.checked = false));
+    renderChips(currentTechniques, log.techniques);
     fields.doya.value = log.doya.join('\n');
     fields.gunu.value = log.gunu.join('\n');
     fields.hate.value = log.hate.join('\n');
@@ -214,15 +255,28 @@ export function initPostApp() {
   });
 
   // ---- 画面の切り替え ----
-  const showView = (view: 'new' | 'past') => {
+  const showTechniques = initTechniqueView({
+    categories,
+    needSettings,
+    describeError,
+    onChanged: (list) => {
+      currentTechniques = list;
+      renderChips(list);
+    },
+  });
+  const showView = (view: 'new' | 'past' | 'tech') => {
     tabNew.setAttribute('aria-pressed', String(view === 'new'));
     tabPast.setAttribute('aria-pressed', String(view === 'past'));
+    tabTech.setAttribute('aria-pressed', String(view === 'tech'));
     form.hidden = view !== 'new';
     pastView.hidden = view !== 'past';
+    techView.hidden = view !== 'tech';
     if (view === 'past') loadPast();
+    if (view === 'tech') showTechniques();
   };
   tabNew.addEventListener('click', () => showView('new'));
   tabPast.addEventListener('click', () => showView('past'));
+  tabTech.addEventListener('click', () => showView('tech'));
 
   // ---- 投稿・更新 ----
   form.addEventListener('submit', async (e) => {

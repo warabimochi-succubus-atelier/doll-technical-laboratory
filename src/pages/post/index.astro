@@ -42,7 +42,7 @@ const siteUrl = new URL(url('/'), Astro.site).href;
       rel="stylesheet"
     />
   </head>
-  <body class="post-app" data-site-url={siteUrl}>
+  <body class="post-app" data-site-url={siteUrl} data-categories={JSON.stringify(categories)}>
     <header class="post-header">
       <h1>制作ログを投稿</h1>
       <button type="button" class="post-icon-btn" id="open-settings" aria-label="設定">⚙</button>
@@ -56,7 +56,16 @@ const siteUrl = new URL(url('/'), Astro.site).href;
       <nav class="post-tabs" aria-label="画面の切り替え">
         <button type="button" class="post-tab" id="tab-new" aria-pressed="true">投稿する</button>
         <button type="button" class="post-tab" id="tab-past" aria-pressed="false">過去の投稿</button>
+        <button type="button" class="post-tab" id="tab-tech" aria-pressed="false">技術リスト</button>
       </nav>
+
+      <section id="tech-view" hidden>
+        <p class="post-note">技法の追加・名前の変更・並べ替え・削除ができます。名前を変えると、その技法を使っている制作ログも自動で書き換えます。</p>
+        <p class="post-error" id="tech-error" role="alert" hidden></p>
+        <p class="post-status" id="tech-status" role="status" aria-live="polite"></p>
+        <div id="tech-list"></div>
+        <button type="button" class="post-btn post-more" id="tech-add">＋ 技法を追加</button>
+      </section>
 
       <section id="past-view" hidden>
         <p class="post-note">新しい順に表示します。投稿した直後の、サイトにまだ反映されていないログも出ます。</p>
@@ -97,7 +106,7 @@ const siteUrl = new URL(url('/'), Astro.site).href;
             <input type="date" id="date" />
           </label>
 
-          <fieldset class="post-field">
+          <fieldset class="post-field" id="technique-chips">
             <legend>試した技法</legend>
             {groups.map((g) => (
               <div class="post-tech-group">
@@ -167,6 +176,34 @@ const siteUrl = new URL(url('/'), Astro.site).href;
           <span class="post-spacer"></span>
           <button type="button" class="post-btn" id="cancel-settings">閉じる</button>
           <button type="submit" class="post-btn post-btn-primary" id="save-settings">確認して保存</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="post-settings" id="tech-dialog">
+      <form method="dialog" id="tech-form" novalidate>
+        <h2 id="tech-dialog-title">技法を追加</h2>
+        <label class="post-field">
+          <span>技法名</span>
+          <input type="text" id="tech-name" autocomplete="off" placeholder="下まつ毛" />
+        </label>
+        <label class="post-field">
+          <span>カテゴリ</span>
+          <select id="tech-category">
+            {categories.map((c) => <option value={c}>{c}</option>)}
+          </select>
+        </label>
+        <label class="post-field">
+          <span>メモ <small>任意・技法のページに表示</small></span>
+          <textarea id="tech-memo" rows="4"></textarea>
+        </label>
+        <p class="post-note" id="tech-rename-note" hidden>名前を変えると、この技法を使っている制作ログも書き換わり、技法のページの URL も変わります。</p>
+        <p class="post-error" id="tech-dialog-error" role="alert" hidden></p>
+        <div class="post-settings-actions">
+          <button type="button" class="post-link-btn post-danger-link" id="tech-delete">この技法を削除</button>
+          <span class="post-spacer"></span>
+          <button type="button" class="post-btn" id="tech-cancel">閉じる</button>
+          <button type="submit" class="post-btn post-btn-primary" id="tech-save">保存</button>
         </div>
       </form>
     </dialog>

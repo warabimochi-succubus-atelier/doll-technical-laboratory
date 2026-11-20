@@ -254,7 +254,7 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
 .post-btn { font: inherit; padding: .45rem 1rem; border: 1px solid var(--accent); border-radius: 999px; background: transparent; color: var(--accent); cursor: pointer; }
 .post-btn-primary { background: var(--accent); color: #fff; }
 .post-btn:disabled { opacity: .6; }
-.post-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: .25rem; padding: .25rem; margin: 0 0 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; }
+.post-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: .25rem; padding: .25rem; margin: 0 0 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; }
 .post-tab { font: inherit; padding: .5rem; border: 0; border-radius: 999px; background: transparent; color: var(--text); cursor: pointer; }
 .post-tab[aria-pressed='true'] { background: var(--accent); color: #fff; font-weight: 700; }
 /* minmax(0, 1fr)：長い1行の要約で行が画面より広がらないように */
@@ -270,7 +270,7 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
 .post-past-sub { font-size: .85rem; color: var(--muted); }
 .post-more { display: block; margin: 1rem auto 0; }
 .post-editing { display: flex; flex-wrap: wrap; gap: .25rem .75rem; align-items: center; justify-content: space-between; background: #fff4d6; border: 1px solid #ecd28a; border-radius: var(--radius); padding: .6rem .9rem; margin: 0 0 1rem; }
-.post-editing[hidden], .post-delete[hidden], .post-more[hidden], #past-view[hidden], #post-form[hidden] { display: none; }
+.post-editing[hidden], .post-delete[hidden], .post-more[hidden], #past-view[hidden], #tech-view[hidden], #post-form[hidden], #tech-rename-note[hidden], .post-danger-link[hidden] { display: none; }
 .post-delete { display: block; width: 100%; margin-top: .75rem; font: inherit; padding: .6rem; border: 1px solid #b3261e; border-radius: 999px; background: transparent; color: #b3261e; cursor: pointer; }
 .post-delete:disabled { opacity: .6; }
 
@@ -280,3 +280,14 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
   .card { padding: 1.1rem; }
   .exp-row { grid-template-columns: 6.5em 1fr; }
 }
+
+.post-tab { white-space: nowrap; font-size: .95rem; }
+.post-tech-section { margin-bottom: 1rem; }
+.post-tech-section h2 { font-size: 1.05rem; margin: 0 0 .5rem; }
+.post-tech-section .post-past-item { padding: .5rem .75rem; }
+.post-tech-name { font-weight: 700; }
+.post-tech-memo { font-size: .8rem; color: var(--muted); }
+.post-icon-mini { font: inherit; width: 36px; height: 36px; padding: 0; border: 1px solid var(--border); border-radius: 999px; background: #fff; color: var(--text); cursor: pointer; }
+.post-icon-mini:disabled { opacity: .35; cursor: default; }
+.post-field select { font: inherit; font-size: 16px; width: 100%; padding: .5rem .65rem; border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--text); }
+.post-danger-link { color: #b3261e; }
