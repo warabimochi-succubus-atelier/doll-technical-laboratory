@@ -1,0 +1,162 @@
+---
+// 投稿アプリ（PWA）。ナビゲーションには出さず、検索エンジンにも載せない。
+// 仕様は docs/posting-app-spec.md
+import { getCollection } from 'astro:content';
+import '../../styles/global.css';
+import { categories } from '../../data/categories';
+import { url } from '../../lib/url';
+
+const logs = (await getCollection('logs')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const techniques = await getCollection('techniques');
+
+// ドール名（新しいログに出てきた順）と、カテゴリ別の技法
+const dolls = [...new Set(logs.map((l) => l.data.doll))];
+const groups = categories
+  .map((category) => ({
+    category,
+    items: techniques
+      .filter((t) => t.data.category === category)
+      .sort((a, b) => a.data.order - b.data.order)
+      .map((t) => ({ id: t.id, name: t.data.name })),
+  }))
+  .filter((g) => g.items.length > 0);
+
+const siteUrl = new URL(url('/'), Astro.site).href;
+---
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>制作ログを投稿 | どーる技術研究室</title>
+    <link rel="manifest" href={url('/post/manifest.webmanifest')} />
+    <link rel="apple-touch-icon" href={url('/apple-touch-icon.png')} />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="研究室投稿" />
+    <meta name="theme-color" content="#c9577a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Zen+Old+Mincho:wght@600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="post-app" data-site-url={siteUrl}>
+    <header class="post-header">
+      <h1>制作ログを投稿</h1>
+      <button type="button" class="post-icon-btn" id="open-settings" aria-label="設定">⚙</button>
+    </header>
+
+    <main class="post-main">
+      <p class="post-banner" id="settings-banner" hidden>
+        はじめに<button type="button" class="post-link-btn" data-open-settings>設定</button>から GitHub のトークンを入力してください。
+      </p>
+
+      <form id="post-form" novalidate>
+        <section class="card">
+          <label class="post-photo-add">
+            <input type="file" id="photo-input" accept="image/*" multiple />
+            <span>＋ 写真を追加（最大5枚）</span>
+          </label>
+          <ul class="post-photo-list" id="photo-list"></ul>
+          <p class="post-note">位置情報などの撮影データは、送信前に自動で削除されます。</p>
+          <label class="post-check" id="check-background-row">
+            <input type="checkbox" id="check-background" />
+            写真の背景に、個人情報や見せたくないものが写っていない
+          </label>
+        </section>
+
+        <section class="card post-fields">
+          <label class="post-field">
+            <span>ドール <em>必須</em></span>
+            <input type="text" id="doll" list="doll-list" autocomplete="off" placeholder="DD桜" />
+            <datalist id="doll-list">
+              {dolls.map((d) => <option value={d} />)}
+            </datalist>
+          </label>
+
+          <label class="post-field">
+            <span>日付</span>
+            <input type="date" id="date" />
+          </label>
+
+          <fieldset class="post-field">
+            <legend>試した技法</legend>
+            {groups.map((g) => (
+              <div class="post-tech-group">
+                <p class="post-tech-category">{g.category}</p>
+                <div class="post-chips">
+                  {g.items.map((t) => (
+                    <label class="post-chip">
+                      <input type="checkbox" name="technique" value={t.id} />
+                      <span>{t.name}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </fieldset>
+
+          <label class="post-field">
+            <span><span class="reaction">どやぁ</span> <small>成功・1行に1つ</small></span>
+            <textarea id="doya" rows="2"></textarea>
+          </label>
+          <label class="post-field">
+            <span><span class="reaction">ぐぬぬ</span> <small>苦戦・1行に1つ</small></span>
+            <textarea id="gunu" rows="2"></textarea>
+          </label>
+          <label class="post-field">
+            <span><span class="reaction">はて？</span> <small>疑問・1行に1つ</small></span>
+            <textarea id="hate" rows="2"></textarea>
+          </label>
+          <label class="post-field">
+            <span>メモ</span>
+            <textarea id="memo" rows="3"></textarea>
+          </label>
+        </section>
+
+        <section class="card">
+          <label class="post-check">
+            <input type="checkbox" id="check-public" />
+            公開サイトに載ることを理解している
+          </label>
+          <p class="post-error" id="form-error" role="alert" hidden></p>
+          <button type="submit" class="post-submit" id="submit">投稿</button>
+          <p class="post-status" id="status" role="status" aria-live="polite"></p>
+        </section>
+      </form>
+    </main>
+
+    <dialog class="post-settings" id="settings">
+      <form method="dialog" id="settings-form" novalidate>
+        <h2>GitHub の設定</h2>
+        <label class="post-field">
+          <span>リポジトリ</span>
+          <input type="text" id="repo" autocomplete="off" spellcheck="false" />
+        </label>
+        <label class="post-field">
+          <span>トークン（Fine-grained Personal Access Token）</span>
+          <input type="password" id="token" autocomplete="off" spellcheck="false" placeholder="github_pat_…" />
+        </label>
+        <p class="post-note">
+          <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">トークンを作る</a>
+          ときは、Repository access を<strong>このリポジトリだけ</strong>、Permissions を <strong>Contents: Read and write</strong> だけにし、有効期限を付けてください。
+          トークンはこの端末のブラウザ内にだけ保存され、GitHub 以外には送られません。
+        </p>
+        <p class="post-error" id="settings-error" role="alert" hidden></p>
+        <div class="post-settings-actions">
+          <button type="button" class="post-link-btn" id="delete-token">トークンを削除</button>
+          <span class="post-spacer"></span>
+          <button type="button" class="post-btn" id="cancel-settings">閉じる</button>
+          <button type="submit" class="post-btn post-btn-primary" id="save-settings">確認して保存</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script>
+      import { initPostApp } from '../../lib/post/app';
+      initPostApp();
+    </script>
+  </body>
+</html>

@@ -3,7 +3,7 @@
 未経験の技法を試し、その結果を記録するための研究室サイト。Astro 製。
 コンセプトの元メモは [docs/concept.md](docs/concept.md)、運用方針の原文は [docs/policy.md](docs/policy.md)。
 サイト上では「この研究室について」（`src/pages/about.astro`）にこの2つをまとめて掲載しています。
-iPhone から制作ログを投稿するアプリ（開発予定）の仕様は [docs/posting-app-spec.md](docs/posting-app-spec.md)。
+iPhone から制作ログを投稿するアプリの仕様は [docs/posting-app-spec.md](docs/posting-app-spec.md)。
 
 > **このリポジトリについて**
 > わらびもちサキュバス工房が自分の制作記録のために作っている、個人専用のサイトです。
@@ -29,6 +29,23 @@ npm run build   # dist/ に静的サイトを出力
 - 公開URL：https://warabimochi-succubus-atelier.github.io/doll-technical-laboratory/
 - サイトはこの `/doll-technical-laboratory/` の下に置かれるため、ページ内のリンクや画像は
   `href="/logs/"` と直接書かず、`src/lib/url.ts` の `url('/logs/')` を通して書きます。
+
+## 投稿アプリ（/post/）
+
+iPhone から写真付きの制作ログを投稿するための、自分専用の Web アプリです。
+https://warabimochi-succubus-atelier.github.io/doll-technical-laboratory/post/
+（ナビゲーションには出しておらず、検索エンジンにも載せない設定です）
+
+1. GitHub で [Fine-grained Personal Access Token](https://github.com/settings/personal-access-tokens/new) を作る
+   - Repository access：このリポジトリだけ
+   - Permissions：Contents を Read and write（ほかは付けない）
+   - 有効期限：あり（切れたら作り直して入れ直す）
+2. iPhone の Safari で上の URL を開き、右上の ⚙ にトークンを入力して「確認して保存」
+3. 共有ボタン →「ホーム画面に追加」すると、アプリのように全画面で使える
+
+投稿すると、写真（長辺1600px・JPEG・位置情報なし）とログが 1 コミットで `main` に追加され、数分でサイトに反映されます。
+トークンは端末のブラウザ内にだけ保存され、GitHub API 以外には送られません。
+コードは `src/pages/post/` と `src/lib/post/`。
 
 ## コンテンツの追加
 
