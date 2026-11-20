@@ -230,7 +230,8 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
 .post-check[hidden] { display: none; }
 .post-check input { width: 1.2rem; height: 1.2rem; margin-top: .3rem; accent-color: var(--accent); flex-shrink: 0; }
 .post-fields { display: grid; gap: 1rem; }
-.post-field { display: grid; gap: .3rem; border: 0; padding: 0; margin: 0; min-width: 0; }
+/* minmax(0, 1fr)：中の入力欄が自分の最小幅で枠を押し広げないように */
+.post-field { display: grid; grid-template-columns: minmax(0, 1fr); gap: .3rem; border: 0; padding: 0; margin: 0; min-width: 0; }
 .post-field > span, .post-field legend { font-weight: 500; }
 .post-field em { font-style: normal; font-size: .75rem; color: var(--accent); margin-left: .3rem; }
 .post-field small { color: var(--muted); font-weight: 400; }
@@ -239,6 +240,13 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
   border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--text);
 }
 .post-field textarea { resize: vertical; }
+/* iPhone の Safari は日付欄に独自の最小幅を持たせるので、それを外して枠の幅に合わせる */
+.post-field input[type='date'] {
+  -webkit-appearance: none; appearance: none;
+  display: block; min-width: 0; max-width: 100%;
+  min-height: 2.9rem; line-height: 1.5; text-align: left; /* ほかの入力欄と同じ高さに */
+}
+.post-field input[type='date']::-webkit-date-and-time-value { text-align: left; margin: 0; }
 .post-field input:focus, .post-field textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
 .post-tech-group { margin-top: .4rem; }
 .post-tech-category { margin: 0 0 .25rem; font-size: .85rem; color: var(--muted); }
