@@ -158,7 +158,8 @@ const siteUrl = new URL(url('/'), Astro.site).href;
 
     <dialog class="post-settings" id="settings">
       <form method="dialog" id="settings-form" novalidate>
-        <h2>GitHub の設定</h2>
+        <!-- 開いたときは見出しにフォーカスを置く（入力欄に置くと iPhone でキーボードが出てしまうため） -->
+        <h2 tabindex="-1" autofocus class="post-dialog-title">GitHub の設定</h2>
         <label class="post-field">
           <span>リポジトリ</span>
           <input type="text" id="repo" autocomplete="off" spellcheck="false" />

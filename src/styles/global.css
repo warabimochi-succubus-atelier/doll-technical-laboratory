@@ -256,6 +256,7 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
 .post-settings::backdrop { background: rgba(20, 12, 14, .5); }
 .post-settings form { display: grid; gap: .9rem; }
 .post-settings h2 { margin: 0; }
+.post-dialog-title:focus { outline: none; }
 .post-settings-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
 .post-spacer { flex: 1; }
 .post-btn { font: inherit; padding: .45rem 1rem; border: 1px solid var(--accent); border-radius: 999px; background: transparent; color: var(--accent); cursor: pointer; }
