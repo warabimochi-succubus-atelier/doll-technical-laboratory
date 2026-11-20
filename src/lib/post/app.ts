@@ -76,6 +76,7 @@ export function initPostApp() {
   const tabTech = $<HTMLButtonElement>('tab-tech');
   const techView = $('tech-view');
   const categories: string[] = JSON.parse(document.body.dataset.categories ?? '[]');
+  const researchFields: { name: string; categories: string[] }[] = JSON.parse(document.body.dataset.fields ?? '[]');
   const pastList = $<HTMLUListElement>('past-list');
   const pastMore = $<HTMLButtonElement>('past-more');
   const pastError = $('past-error');
@@ -257,6 +258,7 @@ export function initPostApp() {
   // ---- 画面の切り替え ----
   const showTechniques = initTechniqueView({
     categories,
+    fields: researchFields,
     needSettings,
     describeError,
     onChanged: (list) => {

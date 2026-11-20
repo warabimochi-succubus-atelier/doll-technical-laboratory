@@ -2,8 +2,14 @@
 import { url } from '../../lib/url';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getTechniquesByCategory } from '../../lib/stats';
+import { fields } from '../../data/categories';
 
 const groups = await getTechniquesByCategory();
+// 研究分野ごとにカテゴリをまとめる
+const sections = fields.map((f) => ({
+  name: f.name,
+  groups: groups.filter((g) => (f.categories as readonly string[]).includes(g.category)),
+}));
 ---
 <BaseLayout title="技術リスト">
   <section class="card">
@@ -11,24 +17,29 @@ const groups = await getTechniquesByCategory();
     <p>試してみたい技法の一覧。制作ログで使うと自動でチェックが付きます。</p>
   </section>
 
-  {groups.map((g) => (
+  {sections.map((s) => (
     <section class="card">
-      <h2>{g.category}</h2>
-      {g.items.length === 0 ? (
-        <p class="muted">まだ技法が登録されていません。</p>
-      ) : (
-        <ul class="tech-list">
-          {g.items.map(({ entry, count }) => (
-            <li class={count > 0 ? 'tried' : ''}>
-              <a href={url(`/techniques/${entry.id}/`)}>
-                <span class="check" aria-hidden="true">{count > 0 ? '☑' : '☐'}</span>
-                {entry.data.name}
-                {count > 0 && <span class="count">{count}回</span>}
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
+      <h2>{s.name}</h2>
+      {s.groups.map((g) => (
+        <div class="tech-category">
+          <h3>{g.category}</h3>
+          {g.items.length === 0 ? (
+            <p class="muted">まだ技法が登録されていません。</p>
+          ) : (
+            <ul class="tech-list">
+              {g.items.map(({ entry, count }) => (
+                <li class={count > 0 ? 'tried' : ''}>
+                  <a href={url(`/techniques/${entry.id}/`)}>
+                    <span class="check" aria-hidden="true">{count > 0 ? '☑' : '☐'}</span>
+                    {entry.data.name}
+                    {count > 0 && <span class="count">{count}回</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
     </section>
   ))}
 </BaseLayout>

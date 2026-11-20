@@ -6,13 +6,14 @@ const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as 
 
 interface Options {
   categories: readonly string[];
+  fields: readonly { name: string; categories: readonly string[] }[];
   needSettings: () => Settings;
   describeError: (e: unknown) => string;
   /** 技術リストが変わったとき（投稿画面の技法ボタンを作り直す） */
   onChanged: (list: Technique[]) => void;
 }
 
-export function initTechniqueView({ categories, needSettings, describeError, onChanged }: Options) {
+export function initTechniqueView({ categories, fields, needSettings, describeError, onChanged }: Options) {
   const listEl = $('tech-list');
   const errorEl = $('tech-error');
   const statusEl = $('tech-status');
@@ -64,37 +65,42 @@ export function initTechniqueView({ categories, needSettings, describeError, onC
   const render = () => {
     if (!all) return;
     const sorted = sortTechniques(all, categories);
+    const sectionFor = (category: string) => {
+      const group = sorted.filter((t) => t.category === category);
+      const section = Object.assign(document.createElement('section'), { className: 'post-tech-section' });
+      section.append(Object.assign(document.createElement('h3'), { textContent: `${category}（${group.length}）` }));
+      const ul = Object.assign(document.createElement('ul'), { className: 'post-past-list' });
+      group.forEach((t, i) => {
+        const li = Object.assign(document.createElement('li'), { className: 'post-past-item' });
+        const main = Object.assign(document.createElement('div'), { className: 'post-past-main' });
+        main.append(Object.assign(document.createElement('p'), { className: 'post-tech-name', textContent: t.name }));
+        if (t.memo) main.append(Object.assign(document.createElement('p'), { className: 'post-tech-memo', textContent: t.memo.split('\n')[0] }));
+        const mk = (text: string, label: string, onClick: () => void, cls = 'post-icon-mini') => {
+          const b = Object.assign(document.createElement('button'), { type: 'button', className: cls, textContent: text });
+          b.setAttribute('aria-label', label);
+          b.addEventListener('click', onClick);
+          return b;
+        };
+        const up = mk('↑', `${t.name}を上へ`, () => move(t, -1));
+        const down = mk('↓', `${t.name}を下へ`, () => move(t, 1));
+        up.disabled = i === 0 || busy;
+        down.disabled = i === group.length - 1 || busy;
+        const edit = mk('編集', `${t.name}を編集`, () => openDialog(t), 'post-btn');
+        edit.disabled = busy;
+        const actions = Object.assign(document.createElement('div'), { className: 'post-past-actions' });
+        actions.append(up, down, edit);
+        li.append(main, actions);
+        ul.append(li);
+      });
+      section.append(ul);
+      return section;
+    };
+    // 研究分野ごとの見出しの下に、カテゴリを並べる
     listEl.replaceChildren(
-      ...categories.map((category) => {
-        const group = sorted.filter((t) => t.category === category);
-        const section = Object.assign(document.createElement('section'), { className: 'post-tech-section' });
-        section.append(Object.assign(document.createElement('h2'), { textContent: `${category}（${group.length}）` }));
-        const ul = Object.assign(document.createElement('ul'), { className: 'post-past-list' });
-        group.forEach((t, i) => {
-          const li = Object.assign(document.createElement('li'), { className: 'post-past-item' });
-          const main = Object.assign(document.createElement('div'), { className: 'post-past-main' });
-          main.append(Object.assign(document.createElement('p'), { className: 'post-tech-name', textContent: t.name }));
-          if (t.memo) main.append(Object.assign(document.createElement('p'), { className: 'post-tech-memo', textContent: t.memo.split('\n')[0] }));
-          const mk = (text: string, label: string, onClick: () => void, cls = 'post-icon-mini') => {
-            const b = Object.assign(document.createElement('button'), { type: 'button', className: cls, textContent: text });
-            b.setAttribute('aria-label', label);
-            b.addEventListener('click', onClick);
-            return b;
-          };
-          const up = mk('↑', `${t.name}を上へ`, () => move(t, -1));
-          const down = mk('↓', `${t.name}を下へ`, () => move(t, 1));
-          up.disabled = i === 0 || busy;
-          down.disabled = i === group.length - 1 || busy;
-          const edit = mk('編集', `${t.name}を編集`, () => openDialog(t), 'post-btn');
-          edit.disabled = busy;
-          const actions = Object.assign(document.createElement('div'), { className: 'post-past-actions' });
-          actions.append(up, down, edit);
-          li.append(main, actions);
-          ul.append(li);
-        });
-        section.append(ul);
-        return section;
-      }),
+      ...fields.flatMap((f) => [
+        Object.assign(document.createElement('h2'), { className: 'post-field-heading', textContent: f.name }),
+        ...f.categories.map(sectionFor),
+      ]),
     );
   };
 

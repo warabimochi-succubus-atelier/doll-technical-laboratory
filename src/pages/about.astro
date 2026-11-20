@@ -1,29 +1,18 @@
 ---
 import { url } from '../lib/url';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
 import { reactions } from '../data/reactions';
+import { fields } from '../data/categories';
 // 文言は docs/concept.md と docs/policy.md（運用方針の原文）を短くまとめたもの
 
-const fields = [
-  {
-    name: 'ドールメイク研究',
-    items: ['眉毛', 'アイライン・まつ毛', 'チーク表現', '陰影表現', '下書き手法'],
-  },
-  {
-    name: 'レジンアイ研究',
-    items: ['虹彩表現', '研磨工程', 'コーティング', '材料比較', '工法改善'],
-  },
-  {
-    name: '撮影研究',
-    items: ['スマートフォン撮影', '自然光撮影', '室内照明撮影', '背景研究'],
-    planned: true,
-  },
-  {
-    name: '道具研究',
-    items: ['筆', 'シャープペン', '研磨工具', '拡大鏡や照明機材'],
-    planned: true,
-  },
-];
+// 研究分野とカテゴリは src/data/categories.ts から作る。技法がまだ1つもない研究分野は「今後扱う予定」と表示する
+const techniques = await getCollection('techniques');
+const fieldList = fields.map((f) => ({
+  name: f.name,
+  items: f.categories,
+  planned: !techniques.some((t) => (f.categories as readonly string[]).includes(t.data.category)),
+}));
 ---
 <BaseLayout title="この研究室について">
   <section class="about-visual">
@@ -71,7 +60,7 @@ const fields = [
   <section class="card">
     <h2>研究分野</h2>
     <div class="field-grid">
-      {fields.map((f) => (
+      {fieldList.map((f) => (
         <div class="field">
           <h3>
             {f.name}
