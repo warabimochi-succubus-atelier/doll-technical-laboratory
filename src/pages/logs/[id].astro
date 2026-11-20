@@ -15,10 +15,10 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 const date = formatDate(entry.data.date);
 ---
-<BaseLayout title={`${date} ${entry.data.doll}`}>
+<BaseLayout title={`${date} ${entry.data.title}`}>
   <article class="card">
     <p class="muted"><time>{date}</time></p>
-    <h1>{entry.data.doll}</h1>
+    <h1>{entry.data.title}</h1>
 
     <LogPhotos log={entry} />
 

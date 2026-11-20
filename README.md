@@ -94,7 +94,7 @@ order: 1             # カテゴリ内の並び順
 ```md
 ---
 date: 2026-12-10
-doll: DD桜
+title: DD桜
 photos:              # public/images/logs/ に置いた写真のファイル名（省略可）
   - 2026-12-10-1.jpg
 techniques:          # techniques/ のファイル名（拡張子なし）

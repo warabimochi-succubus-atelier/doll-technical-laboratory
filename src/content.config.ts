@@ -21,7 +21,8 @@ const logs = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/logs' }),
   schema: z.object({
     date: z.coerce.date(),
-    doll: z.string(),
+    // 件名（ドール名でも、アイなどパーツの名前でもよい）
+    title: z.string(),
     // public/images/logs/ に置いた写真のファイル名（省略・空欄可）。ファイルがなければビルドを止める
     photos: z.preprocess(
       (v) => v ?? [],

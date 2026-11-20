@@ -77,7 +77,7 @@ const untried = (await getTechniquesByCategory())
                 : <span class="log-thumb log-thumb-sm log-thumb-empty" aria-hidden="true"></span>;
             })()}
             <time>{formatDate(log.data.date)}</time>
-            <span class="log-doll">{log.data.doll}</span>
+            <span class="log-title">{log.data.title}</span>
             <span class="log-techs">{log.data.techniques.map((t) => t.id).join('・')}</span>
           </a>
         </li>

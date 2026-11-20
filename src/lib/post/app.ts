@@ -55,7 +55,7 @@ export function initPostApp() {
   const bgRow = $('check-background-row');
   const bgCheck = $<HTMLInputElement>('check-background');
   const publicCheck = $<HTMLInputElement>('check-public');
-  const doll = $<HTMLInputElement>('doll');
+  const title = $<HTMLInputElement>('title');
   const date = $<HTMLInputElement>('date');
   const fields = {
     doya: $<HTMLTextAreaElement>('doya'),
@@ -237,7 +237,7 @@ export function initPostApp() {
 
   const fillForm = (log: LogInput) => {
     form.reset();
-    doll.value = log.doll;
+    title.value = log.title;
     date.value = log.date;
     chipsBox.querySelectorAll<HTMLInputElement>('input[name="technique"]').forEach((c) => (c.checked = false));
     renderChips(currentTechniques, log.techniques);
@@ -249,7 +249,7 @@ export function initPostApp() {
 
   const readForm = () => ({
     date: date.value || nowInJapan().date,
-    doll: doll.value.trim(),
+    title: title.value.trim(),
     techniques: [...form.querySelectorAll<HTMLInputElement>('input[name="technique"]:checked')].map((c) => c.value),
     doya: splitLines(fields.doya.value),
     gunu: splitLines(fields.gunu.value),
@@ -295,8 +295,8 @@ export function initPostApp() {
       ? '写真の縮小が終わるまでお待ちください。'
       : !settings
       ? 'GitHub の設定がまだです。右上の ⚙ から設定してください。'
-      : !input.doll
-        ? 'ドールを入力してください。'
+      : !input.title
+        ? '件名を入力してください。'
         : photos.length === 0 && !input.doya.length && !input.gunu.length && !input.hate.length && !input.memo.trim()
           ? '写真・感想・メモのどれかを入力してください。'
           : hasNewPhotos && !bgCheck.checked
@@ -348,7 +348,7 @@ export function initPostApp() {
 
       status.textContent = '送信しています…';
       const verb = editing ? 'Edit' : 'Add';
-      await commitFiles(repo, token, files, `${verb} log: ${input.date} ${input.doll}`);
+      await commitFiles(repo, token, files, `${verb} log: ${input.date} ${input.title}`);
 
       const logUrl = `${siteUrl}logs/${stem}/`;
       const done = editing ? '✅ 更新しました。' : '✅ 送信しました。';
@@ -372,7 +372,7 @@ export function initPostApp() {
     const { repo, token } = needSettings();
     const log = parseLogMarkdown(await getTextFile(repo, token, `${LOGS_DIR}/${stem}.md`));
     const ok = window.confirm(
-      `${stem}（${log.doll}）を削除します。` +
+      `${stem}（${log.title}）を削除します。` +
         (log.photos.length ? `写真${log.photos.length}枚も一緒に削除します。` : '') +
         '\nサイトからは消えますが、GitHub の履歴には残ります。よろしいですか？',
     );
@@ -381,7 +381,7 @@ export function initPostApp() {
       { path: `${LOGS_DIR}/${stem}.md`, delete: true },
       ...log.photos.map((p) => ({ path: `${PHOTOS_DIR}/${p}`, delete: true as const })),
     ];
-    await commitFiles(repo, token, files, `Delete log: ${log.date} ${log.doll}`);
+    await commitFiles(repo, token, files, `Delete log: ${log.date} ${log.title}`);
     invalidatePast();
     return true;
   };
@@ -434,7 +434,7 @@ export function initPostApp() {
     const main = document.createElement('div');
     main.className = 'post-past-main';
     const d = Object.assign(document.createElement('p'), { className: 'post-past-date', textContent: stem });
-    const who = Object.assign(document.createElement('p'), { className: 'post-past-doll', textContent: '読み込み中…' });
+    const who = Object.assign(document.createElement('p'), { className: 'post-past-title', textContent: '読み込み中…' });
     const sub = Object.assign(document.createElement('p'), { className: 'post-past-sub', textContent: '' });
     main.append(d, who, sub);
     const edit = Object.assign(document.createElement('button'), { type: 'button', className: 'post-btn', textContent: '編集' });
@@ -467,7 +467,7 @@ export function initPostApp() {
     getTextFile(repo, token, `${LOGS_DIR}/${name}`)
       .then((text) => {
         const log = parseLogMarkdown(text);
-        who.textContent = log.doll || '（ドール名なし）';
+        who.textContent = log.title || '（件名なし）';
         const first = log.doya[0] ?? log.gunu[0] ?? log.hate[0] ?? log.memo.split('\n')[0] ?? '';
         sub.textContent = [log.photos.length ? `写真${log.photos.length}枚` : '', first].filter(Boolean).join('・');
       })

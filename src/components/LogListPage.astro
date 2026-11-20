@@ -38,7 +38,7 @@ const pages = Array.from({ length: total }, (_, i) => i + 1);
               {photos.length > 0 && <span class="photo-count">写真{photos.length}枚</span>}
             </h2>
             <dl class="log-meta">
-              <dt>対象</dt><dd>{log.data.doll}</dd>
+              <dt>件名</dt><dd>{log.data.title}</dd>
               <dt>試した技術</dt>
               <dd>
                 {log.data.techniques.map((t) => <a class="tag" href={url(`/techniques/${t.id}/`)}>{t.id}</a>)}

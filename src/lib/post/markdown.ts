@@ -3,7 +3,7 @@
 
 export interface LogInput {
   date: string; // YYYY-MM-DD
-  doll: string;
+  title: string;
   photos: string[]; // public/images/logs/ のファイル名
   techniques: string[]; // 技法 ID（techniques/ のファイル名）
   doya: string[];
@@ -22,7 +22,7 @@ export function buildLogMarkdown(input: LogInput): string {
   return [
     '---',
     `date: ${input.date}`,
-    `doll: ${quote(input.doll)}`,
+    `title: ${quote(input.title)}`,
     list('photos', input.photos),
     list('techniques', input.techniques),
     list('どやぁ', input.doya),
@@ -84,7 +84,8 @@ export function parseLogMarkdown(text: string): LogInput {
   const { arr, str, body } = parseFrontmatter(text);
   return {
     date: str('date'),
-    doll: str('doll'),
+    // 以前のログは doll: で書いていたので、そちらも読む
+    title: str('title') || str('doll'),
     photos: arr('photos'),
     techniques: arr('techniques'),
     doya: arr('どやぁ'),

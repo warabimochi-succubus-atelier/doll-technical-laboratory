@@ -30,7 +30,7 @@ const logs = (await getLogs()).filter((log) => log.data.techniques.some((t) => t
           <li>
             <a href={url(`/logs/${log.id}/`)}>
               <time>{formatDate(log.data.date)}</time>
-              <span class="log-doll">{log.data.doll}</span>
+              <span class="log-title">{log.data.title}</span>
             </a>
           </li>
         ))}

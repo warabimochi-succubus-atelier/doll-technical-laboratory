@@ -142,7 +142,7 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
 .log-list { list-style: none; padding: 0; margin: 0 0 1rem; }
 .log-list li a { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem 1rem; padding: .5rem 0; border-bottom: 1px dashed var(--border); color: var(--text); }
 .log-list time { color: var(--muted); font-variant-numeric: tabular-nums; }
-.log-doll { font-weight: 700; }
+.log-title { font-weight: 700; }
 .log-techs { color: var(--accent); }
 
 .log-meta { display: grid; grid-template-columns: 6em 1fr; gap: .25rem; margin: 0 0 .75rem; }
@@ -293,7 +293,7 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
 .post-past-actions .post-btn { white-space: nowrap; }
 .post-past-main p { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .post-past-date { font-size: .85rem; color: var(--muted); }
-.post-past-doll { font-weight: 700; }
+.post-past-title { font-weight: 700; }
 .post-past-sub { font-size: .85rem; color: var(--muted); }
 .post-more { display: block; margin: 1rem auto 0; }
 .post-editing { display: flex; flex-wrap: wrap; gap: .25rem .75rem; align-items: center; justify-content: space-between; background: #fff4d6; border: 1px solid #ecd28a; border-radius: var(--radius); padding: .6rem .9rem; margin: 0 0 1rem; }

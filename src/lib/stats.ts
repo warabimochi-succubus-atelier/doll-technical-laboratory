@@ -45,12 +45,12 @@ export async function getTechniquesByCategory() {
   }));
 }
 
-/** ログの写真（URL と説明文）。説明文は「ドール名 日付 写真N」で自動生成する */
+/** ログの写真（URL と説明文）。説明文は「件名 日付 写真N」で自動生成する */
 export function getLogPhotos(log: Log) {
   const date = formatDate(log.data.date);
   return log.data.photos.map((name, i) => ({
     src: url(`/images/logs/${name}`),
-    alt: `${log.data.doll} ${date} 写真${i + 1}`,
+    alt: `${log.data.title} ${date} 写真${i + 1}`,
   }));
 }
 

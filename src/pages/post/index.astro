@@ -9,8 +9,8 @@ import { url } from '../../lib/url';
 const logs = (await getCollection('logs')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 const techniques = await getCollection('techniques');
 
-// ドール名（新しいログに出てきた順）と、カテゴリ別の技法
-const dolls = [...new Set(logs.map((l) => l.data.doll))];
+// これまでの件名（新しいログに出てきた順）と、カテゴリ別の技法
+const titles = [...new Set(logs.map((l) => l.data.title))];
 const groups = categories
   .map((category) => ({
     category,
@@ -96,10 +96,10 @@ const siteUrl = new URL(url('/'), Astro.site).href;
 
         <section class="card post-fields">
           <label class="post-field">
-            <span>ドール <em>必須</em></span>
-            <input type="text" id="doll" list="doll-list" autocomplete="off" placeholder="DD桜" />
-            <datalist id="doll-list">
-              {dolls.map((d) => <option value={d} />)}
+            <span>件名 <em>必須</em></span>
+            <input type="text" id="title" list="title-list" autocomplete="off" placeholder="DD桜 / ピンクのレジンアイ" />
+            <datalist id="title-list">
+              {titles.map((t) => <option value={t} />)}
             </datalist>
           </label>
 
