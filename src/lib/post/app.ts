@@ -400,7 +400,9 @@ export function initPostApp() {
         if (await deleteLog(stem)) await loadPast();
       }, '削除'),
     );
-    li.append(main, edit, del);
+    const actions = Object.assign(document.createElement('div'), { className: 'post-past-actions' });
+    actions.append(edit, del);
+    li.append(main, actions);
 
     const { repo, token } = needSettings();
     getTextFile(repo, token, `${LOGS_DIR}/${name}`)
