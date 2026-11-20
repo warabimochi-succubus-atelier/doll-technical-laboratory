@@ -34,7 +34,7 @@ h2 { font-size: 1.25rem; margin: 0 0 1rem; color: var(--accent); }
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
   gap: .75rem 1.5rem;
   padding: .75rem 16px;
-  /* ホーム画面から開いたとき、ステータスバー（ぼかしがかかる部分）に文字が重ならないよう下げる */
+  /* ホーム画面から開いたとき、ステータスバーに文字が重ならないよう下げる（ぼかしの分は下の display-mode: standalone で足す） */
   padding-top: max(.75rem, env(safe-area-inset-top));
   padding-left: max(16px, env(safe-area-inset-left));
   padding-right: max(16px, env(safe-area-inset-right));
@@ -218,6 +218,13 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
   background: var(--surface); border-bottom: 1px solid var(--border);
 }
 .post-header h1 { font-size: 1.2rem; margin: 0; }
+
+/* ホーム画面から開いたとき、iOS のぼかしはステータスバー（安全領域）より少し下まで広がるので、
+   その分の余白を足して、ヘッダの文字がぼかしにかからないようにする */
+@media (display-mode: standalone) {
+  .site-header { padding-top: calc(env(safe-area-inset-top) + 1.75rem); }
+  .post-header { padding-top: calc(env(safe-area-inset-top) + 1.5rem); }
+}
 .post-icon-btn { font: inherit; font-size: 1.3rem; width: 44px; height: 44px; border: 0; background: transparent; color: var(--text); cursor: pointer; }
 .post-banner { background: var(--accent-soft); border-radius: var(--radius); padding: .75rem 1rem; margin: 0 0 1rem; }
 .post-link-btn { font: inherit; color: var(--accent); background: none; border: 0; padding: 0 .2rem; cursor: pointer; text-decoration: underline; }
