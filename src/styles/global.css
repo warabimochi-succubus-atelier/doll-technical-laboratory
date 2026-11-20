@@ -197,8 +197,12 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
 .tech-category + .tech-category { margin-top: 1.1rem; }
 .tech-category h3 { font-size: 1rem; margin: 0 0 .5rem; }
 .tech-category .muted { margin: 0; font-size: .9rem; }
-.tech-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .5rem; }
-.tech-list a { display: flex; align-items: center; gap: .4rem; padding: .4rem .75rem; border: 1px solid var(--border); border-radius: 10px; color: var(--text); }
+/* 技法名は改行しない。ボタンは名前の長さに合わせた幅で並べ、入りきらなければ次の行へ回す
+   （決まった幅の列にすると、フォントの幅がブラウザごとに違うため名前が2行になることがある） */
+.tech-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+.tech-list li { flex: 1 0 auto; min-width: 9em; max-width: 100%; }
+.tech-list a { display: flex; align-items: center; gap: .4rem; padding: .4rem .75rem; border: 1px solid var(--border); border-radius: 10px; color: var(--text); white-space: nowrap; }
+.tech-list .name { overflow: hidden; text-overflow: ellipsis; } /* 画面より長い名前だけは末尾を「…」に */
 .tech-list .tried a { background: var(--accent-soft); border-color: var(--accent); }
 .tech-list .check { color: var(--accent); }
 .tech-list .count { margin-left: auto; font-size: .75rem; color: var(--muted); }
