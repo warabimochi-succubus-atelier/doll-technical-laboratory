@@ -509,6 +509,9 @@ export function initPostApp() {
     tokenInput.value = settings?.token ?? '';
     showError(settingsError, '');
     dialog.showModal();
+    // iPhone の Safari は autofocus を無視して最初の入力欄にフォーカスし、キーボードを出すことがあるので、
+    // 開いた直後に見出しへフォーカスを移す（トークンは貼り付けるだけなのでキーボードは要らない）
+    dialog.querySelector<HTMLElement>('.post-dialog-title')?.focus({ preventScroll: true });
   };
   $('open-settings').addEventListener('click', openSettings);
   document.querySelectorAll('[data-open-settings]').forEach((b) => b.addEventListener('click', openSettings));
