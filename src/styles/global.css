@@ -34,6 +34,10 @@ h2 { font-size: 1.25rem; margin: 0 0 1rem; color: var(--accent); }
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
   gap: .75rem 1.5rem;
   padding: .75rem 16px;
+  /* ホーム画面から開いたとき、ステータスバー（ぼかしがかかる部分）に文字が重ならないよう下げる */
+  padding-top: max(.75rem, env(safe-area-inset-top));
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
@@ -46,7 +50,7 @@ h2 { font-size: 1.25rem; margin: 0 0 1rem; color: var(--accent); }
 .site-header nav a { color: var(--text); white-space: nowrap; }
 .site-header nav a[aria-current='page'] { color: var(--accent); border-bottom: 2px solid var(--accent); }
 
-.site-footer { text-align: center; color: var(--muted); padding: 2rem 16px; }
+.site-footer { text-align: center; color: var(--muted); padding: 2rem 16px; padding-bottom: max(2rem, env(safe-area-inset-bottom)); }
 .site-footer p { margin: 0; }
 
 main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
