@@ -12,7 +12,12 @@ export const GET: APIRoute = () =>
       display: 'standalone',
       background_color: '#fbf4f1',
       theme_color: '#c9577a',
-      icons: [{ src: url('/apple-touch-icon.png'), sizes: '180x180', type: 'image/png' }],
+      // 角丸・円形に切り抜かれても余白が出ないよう、メダルを拡大し縁の色を四隅まで延ばしたアイコン
+      icons: [
+        { src: url('/apple-touch-icon.png'), sizes: '180x180', type: 'image/png' },
+        { src: url('/icon-192.png'), sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+        { src: url('/icon-512.png'), sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+      ],
     }),
     { headers: { 'Content-Type': 'application/manifest+json' } },
   );
