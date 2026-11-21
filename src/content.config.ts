@@ -1,4 +1,4 @@
-import { defineCollection, reference, z } from 'astro:content';
+import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { existsSync } from 'node:fs';
 import { categories } from './data/categories';
@@ -38,7 +38,18 @@ const logs = defineCollection({
         }),
       ),
     ),
-    techniques: z.array(reference('techniques')).default([]),
+    // techniques/ のファイル名（拡張子なし）。技術リストにない名前があればビルドを止める
+    // （Astro の reference() はエラーを表示するだけでビルドが通ってしまい、切れたリンクが公開されるため）
+    techniques: z.preprocess(
+      (v) => v ?? [],
+      z
+        .array(
+          z.string().refine((id) => existsSync(`src/content/techniques/${id}.md`), {
+            message: '技術リスト（src/content/techniques/）にこの技法がありません',
+          }),
+        )
+        .transform((ids) => ids.map((id) => ({ collection: 'techniques' as const, id }))),
+    ),
     // 感想は どやぁ / ぐぬぬ / はて？ に分けて書く（どれも省略・空欄可）
     'どやぁ': impressionList,
     'ぐぬぬ': impressionList,
