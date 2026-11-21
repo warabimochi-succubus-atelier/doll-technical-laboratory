@@ -4,7 +4,7 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Impressions from '../../components/Impressions.astro';
 import LogPhotos from '../../components/LogPhotos.astro';
-import { formatDate } from '../../lib/stats';
+import { formatDate, getTechniqueNames } from '../../lib/stats';
 
 export async function getStaticPaths() {
   const logs = await getCollection('logs');
@@ -14,6 +14,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const date = formatDate(entry.data.date);
+const techniqueNames = await getTechniqueNames();
 ---
 <BaseLayout title={`${date} ${entry.data.title}`}>
   <article class="card">
@@ -23,7 +24,7 @@ const date = formatDate(entry.data.date);
     <LogPhotos log={entry} />
 
     <h2>試した技術</h2>
-    <p>{entry.data.techniques.map((t) => <a class="tag" href={url(`/techniques/${t.id}/`)}>{t.id}</a>)}</p>
+    <p>{entry.data.techniques.map((t) => <a class="tag" href={url(`/techniques/${t.id}/`)}>{techniqueNames.get(t.id) ?? t.id}</a>)}</p>
 
     <h2>感想</h2>
     <Impressions log={entry} />

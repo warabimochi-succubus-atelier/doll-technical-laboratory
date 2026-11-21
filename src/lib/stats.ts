@@ -32,6 +32,11 @@ export async function getReactionCounts() {
   }));
 }
 
+/** 技法ID → 技法名（制作ログの技法は ID で入っているので、表示するときはこれで名前にする） */
+export async function getTechniqueNames(): Promise<Map<string, string>> {
+  return new Map((await getCollection('techniques')).map((t) => [t.id, t.data.name]));
+}
+
 /** カテゴリ別に並べた技法一覧（試した回数つき） */
 export async function getTechniquesByCategory() {
   const techniques = await getCollection('techniques');

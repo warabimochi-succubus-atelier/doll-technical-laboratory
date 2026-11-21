@@ -2,9 +2,10 @@
 import { url } from '../lib/url';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import StarMeter from '../components/StarMeter.astro';
-import { getReactionCounts, getLogs, getLogPhotos, getTechniquesByCategory, formatDate } from '../lib/stats';
+import { getReactionCounts, getLogs, getLogPhotos, getTechniqueNames, getTechniquesByCategory, formatDate } from '../lib/stats';
 
 const reactionCounts = await getReactionCounts();
+const techniqueNames = await getTechniqueNames();
 const recentLogs = (await getLogs()).slice(0, 3);
 const untried = (await getTechniquesByCategory())
   .flatMap((g) => g.items)
@@ -78,7 +79,7 @@ const untried = (await getTechniquesByCategory())
             })()}
             <time>{formatDate(log.data.date)}</time>
             <span class="log-title">{log.data.title}</span>
-            <span class="log-techs">{log.data.techniques.map((t) => t.id).join('・')}</span>
+            <span class="log-techs">{log.data.techniques.map((t) => techniqueNames.get(t.id) ?? t.id).join('・')}</span>
           </a>
         </li>
       ))}

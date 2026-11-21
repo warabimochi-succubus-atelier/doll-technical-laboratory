@@ -4,8 +4,14 @@ import { existsSync } from 'node:fs';
 import { categories } from './data/categories';
 
 // 試したい技法（ファイル名がそのまま技法IDになる 例: 細い線.md）
+// Astro は標準ではファイル名を URL 向けに変形する（「・」や空白を消す、英大文字を小文字にする）。
+// 投稿アプリと制作ログはファイル名で技法を指すので、変形せずにファイル名をそのまま ID にする
 const techniques = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/techniques' }),
+  loader: glob({
+    pattern: '**/*.md',
+    base: './src/content/techniques',
+    generateId: ({ entry }) => entry.replace(/\.md$/, ''),
+  }),
   schema: z.object({
     name: z.string(),
     category: z.enum(categories),
