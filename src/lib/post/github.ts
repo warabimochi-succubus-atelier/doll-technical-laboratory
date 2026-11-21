@@ -66,9 +66,17 @@ export async function listDir(repo: string, token: string, path: string) {
   }
 }
 
-/** ファイルの中身を base64 で取る（1MB 以下のファイル向け） */
+/** ファイルの中身を base64 で取る */
 export async function getFileBase64(repo: string, token: string, path: string) {
-  const f = await gh<{ content: string; encoding: string }>(token, `/repos/${repo}/contents/${encodePath(path)}?ref=${BRANCH}`);
+  const f = await gh<{ content: string; encoding: string; sha: string }>(
+    token,
+    `/repos/${repo}/contents/${encodePath(path)}?ref=${BRANCH}`,
+  );
+  // 1MB を超えるファイルは contents API が中身を返さない（encoding: "none"）ので、blob として取り直す
+  if (f.encoding !== 'base64') {
+    const blob = await gh<{ content: string }>(token, `/repos/${repo}/git/blobs/${f.sha}`);
+    return blob.content.replace(/\n/g, '');
+  }
   return f.content.replace(/\n/g, '');
 }
 
@@ -81,8 +89,20 @@ export async function getTextFile(repo: string, token: string, path: string) {
 /** 追加・上書きするファイル（base64）と、削除するファイル（delete: true） */
 export type NewFile = { path: string; base64: string } | { path: string; delete: true };
 
-/** files をまとめて 1 コミットにして main を進める。main が先に進んでいたら 1 回だけやり直す */
-export async function commitFiles(repo: string, token: string, files: NewFile[], message: string) {
+/**
+ * files をまとめて 1 コミットにして main を進める。
+ * main が先に進んでいたら、retryOnConflict のときだけ 1 回やり直す。
+ * やり直してよいのは、新しいファイルを足すだけのとき（新規投稿）。
+ * 読み込んだ内容を書き換えて作ったファイル（編集・改名・並べ替えなど）は、やり直すと
+ * 先に入った変更を古い内容で上書きしてしまうので、エラーにして読み直してもらう。
+ */
+export async function commitFiles(
+  repo: string,
+  token: string,
+  files: NewFile[],
+  message: string,
+  { retryOnConflict = false } = {},
+) {
   const blobs: ({ sha: string } | null)[] = [];
   for (const f of files) {
     blobs.push(
@@ -118,7 +138,7 @@ export async function commitFiles(repo: string, token: string, files: NewFile[],
       });
       return commit.sha;
     } catch (e) {
-      if (attempt === 0 && e instanceof GitHubError && e.status === 422) continue;
+      if (retryOnConflict && attempt === 0 && e instanceof GitHubError && e.status === 422) continue;
       throw e;
     }
   }

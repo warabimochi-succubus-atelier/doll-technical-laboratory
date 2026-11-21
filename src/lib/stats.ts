@@ -6,10 +6,10 @@ import { url } from './url';
 export type Technique = CollectionEntry<'techniques'>;
 export type Log = CollectionEntry<'logs'>;
 
-/** 新しい順の制作ログ */
+/** 新しい順の制作ログ。同じ日付どうしはファイル名（日付-時刻）の新しい順 */
 export async function getLogs(): Promise<Log[]> {
   const logs = await getCollection('logs');
-  return logs.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  return logs.sort((a, b) => b.data.date.getTime() - a.data.date.getTime() || b.id.localeCompare(a.id));
 }
 
 /** 技法ID → 試した回数 */

@@ -85,6 +85,8 @@ export function initTechniqueView({ fields: initialFields, needSettings, describ
     } catch (e) {
       statusEl.textContent = '';
       showError(errorTarget, `❌ ${label}できませんでした。${describeError(e)}`);
+      // 別の更新とぶつかった可能性があるので、最新の内容を読み直しておく（次の操作が古い内容で上書きしないように）
+      if (all) await reload().catch(() => {});
       return false;
     } finally {
       busy = false;

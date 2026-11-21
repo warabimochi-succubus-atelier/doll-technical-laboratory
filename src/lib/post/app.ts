@@ -321,7 +321,11 @@ export function initPostApp() {
         }
       }
 
-      // 写真の名前：残した写真はそのまま、新しい写真は使われていない番号を振る
+      // 写真の名前：残した写真はそのまま、新しい写真は使われていない番号を振る。
+      // 編集で足す写真は、前に消した写真と同じ名前にならないよう「-e編集日時」を付ける
+      // （同じ名前だと、Pages やブラウザに残った古い写真がしばらく表示されてしまうため）
+      const now = nowInJapan();
+      const prefix = editing ? `${stem}-e${now.date.replace(/-/g, '')}${now.time}` : stem;
       const used = new Set(editing?.originalPhotos ?? []);
       let next = 1;
       const files: NewFile[] = [];
@@ -331,8 +335,8 @@ export function initPostApp() {
           photoNames.push(p.name);
           continue;
         }
-        while (used.has(`${stem}-${next}.jpg`)) next++;
-        const name = `${stem}-${next}.jpg`;
+        while (used.has(`${prefix}-${next}.jpg`)) next++;
+        const name = `${prefix}-${next}.jpg`;
         used.add(name);
         photoNames.push(name);
         files.push({ path: `${PHOTOS_DIR}/${name}`, base64: await blobToBase64(p.blob!) });
@@ -348,7 +352,8 @@ export function initPostApp() {
 
       status.textContent = '送信しています…';
       const verb = editing ? 'Edit' : 'Add';
-      await commitFiles(repo, token, files, `${verb} log: ${input.date} ${input.title}`);
+      // 新規投稿は新しいファイルを足すだけなので、main が先に進んでいても自動でやり直してよい
+      await commitFiles(repo, token, files, `${verb} log: ${input.date} ${input.title}`, { retryOnConflict: !editing });
 
       const logUrl = `${siteUrl}logs/${stem}/`;
       const done = editing ? '✅ 更新しました。' : '✅ 送信しました。';

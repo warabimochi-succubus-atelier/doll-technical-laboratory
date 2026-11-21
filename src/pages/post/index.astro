@@ -4,9 +4,10 @@
 import { getCollection } from 'astro:content';
 import '../../styles/global.css';
 import { categories, fields } from '../../data/categories';
+import { getLogs } from '../../lib/stats';
 import { url } from '../../lib/url';
 
-const logs = (await getCollection('logs')).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const logs = await getLogs();
 const techniques = await getCollection('techniques');
 
 // これまでの件名（新しいログに出てきた順）と、カテゴリ別の技法

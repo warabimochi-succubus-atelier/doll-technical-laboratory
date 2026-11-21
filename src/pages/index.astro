@@ -55,9 +55,16 @@ const untried = (await getTechniquesByCategory())
       </div>
       <script is:inline define:vars={{ untried, techniquesBase: url('/techniques/') }}>
         const el = document.getElementById('suggest-pick');
+        // 技法名に < や & が入っていても崩れないよう、HTML の文字列ではなく要素で組み立てる
         const pick = () => {
           const t = untried[Math.floor(Math.random() * untried.length)];
-          el.innerHTML = `<a href="${techniquesBase}${encodeURIComponent(t.id)}/"><span class="tag">${t.category}</span>${t.name}</a>`;
+          const a = document.createElement('a');
+          a.href = `${techniquesBase}${encodeURIComponent(t.id)}/`;
+          const tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.textContent = t.category;
+          a.append(tag, t.name);
+          el.replaceChildren(a);
         };
         pick();
         document.getElementById('suggest-reroll').addEventListener('click', pick);
