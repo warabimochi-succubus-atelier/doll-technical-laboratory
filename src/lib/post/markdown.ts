@@ -49,28 +49,66 @@ function scalar(raw: string): string {
   return s.replace(/\s+#.*$/, ''); // 行末のコメントを外す
 }
 
+/** [a, "b, c", 'd'] の形のリストを項目に分ける（引用符の中の , では分けない） */
+function flowList(raw: string): string[] {
+  const inner = raw.trim().slice(1, -1);
+  const items: string[] = [];
+  let cur = '';
+  let quote: string | null = null;
+  for (let i = 0; i < inner.length; i++) {
+    const c = inner[i];
+    if (quote) {
+      if (c === '\\' && quote === '"') {
+        cur += c + (inner[++i] ?? '');
+        continue;
+      }
+      if (c === quote) quote = null;
+    } else if (c === '"' || c === "'") {
+      quote = c;
+    } else if (c === ',') {
+      items.push(cur);
+      cur = '';
+      continue;
+    }
+    cur += c;
+  }
+  items.push(cur);
+  return items.map((s) => s.trim()).filter(Boolean).map(scalar);
+}
+
 /**
  * Markdown の先頭の設定部分（--- で囲まれた YAML）と本文を読む。
- * このサイトのファイルで使う書き方（「キー: 値」と「キー:」＋「  - 項目」）だけを読む。
+ * 読めるのは「キー: 値」「キー: [項目, 項目]」と、「キー:」の下に「- 項目」を並べる書き方。
+ * それ以外の書き方（| や > で複数行にする、値を次の行へ続けるなど）は、読み違えて
+ * 上書き保存すると中身が消えるので、読まずにエラーにする。
  */
 function parseFrontmatter(text: string) {
   const m = text.replace(/^﻿/, '').match(/^---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n([\s\S]*))?$/);
   if (!m) throw new Error('ファイルの形式を読み取れませんでした。');
   const data: Record<string, string | string[]> = {};
   let key: string | null = null;
+  const unsupported = (line: string) =>
+    new Error(`アプリでは読めない書き方の行があります：「${line.trim()}」。「キー: 値」か「- 項目」の形に直してください。`);
   for (const line of m[1].split(/\r?\n/)) {
     if (!line.trim() || line.trim().startsWith('#')) continue;
-    const item = line.match(/^\s+-\s?(.*)$/);
-    if (item && key && Array.isArray(data[key])) {
-      (data[key] as string[]).push(scalar(item[1]));
+    const item = line.match(/^\s*-(?:\s+(.*))?$/);
+    if (item) {
+      if (!key || !Array.isArray(data[key])) throw unsupported(line);
+      (data[key] as string[]).push(scalar(item[1] ?? ''));
       continue;
     }
-    const kv = line.match(/^([^\s:][^:]*):(?:\s+(.*))?$/);
-    if (kv) {
-      key = kv[1].trim();
-      const value = (kv[2] ?? '').replace(/^#.*$/, '').trim();
-      data[key] = value === '' ? [] : scalar(value);
+    const kv = line.match(/^([^\s:#-][^:]*):(?:\s+(.*))?$/);
+    if (!kv) throw unsupported(line);
+    key = kv[1].trim();
+    const value = (kv[2] ?? '').replace(/^#.*$/, '').trim();
+    if (/^[|>{]/.test(value)) throw unsupported(line);
+    if (value.startsWith('[')) {
+      const list = value.replace(/\s+#[^\]]*$/, ''); // ] のあとの行末コメントを外す
+      if (!list.endsWith(']')) throw unsupported(line); // 次の行へ続くリスト
+      data[key] = flowList(list);
+      continue;
     }
+    data[key] = value === '' ? [] : scalar(value);
   }
   return {
     arr: (k: string) => (Array.isArray(data[k]) ? (data[k] as string[]) : []),
@@ -129,6 +167,10 @@ export function techniqueNameProblem(name: string): string {
   if (!name) return '技法名を入力してください。';
   if (name.length > 40) return '技法名は40文字以内にしてください。';
   if (/[\\/:*?"<>|#%]/.test(name) || name.startsWith('.')) return '技法名に \\ / : * ? " < > | # % は使えません（先頭の . も不可）。';
+  // Windows で扱えない名前（手元の Windows で git pull やビルドができなくなる）
+  if (/[\x00-\x1f]/.test(name)) return '技法名に制御文字は使えません。';
+  if (name.endsWith('.')) return '技法名の最後に . は使えません。';
+  if (/^(con|prn|aux|nul|com[0-9¹²³]|lpt[0-9¹²³])$/i.test(name)) return `「${name}」は Windows で使えない名前なので、技法名にできません。`;
   return '';
 }
 

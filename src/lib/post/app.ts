@@ -476,8 +476,9 @@ export function initPostApp() {
         const first = log.doya[0] ?? log.gunu[0] ?? log.hate[0] ?? log.memo.split('\n')[0] ?? '';
         sub.textContent = [log.photos.length ? `写真${log.photos.length}枚` : '', first].filter(Boolean).join('・');
       })
-      .catch(() => {
+      .catch((err) => {
         who.textContent = '（読み込めませんでした）';
+        sub.textContent = describeError(err);
       });
     return li;
   };

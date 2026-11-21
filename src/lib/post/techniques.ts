@@ -20,6 +20,16 @@ export interface Technique extends TechniqueInput {
 }
 
 const path = (id: string) => `${DIR}/${id}.md`;
+
+/** 読めないファイルがあったとき、どのファイルかが分かるようにする */
+async function readParsed<T>(file: string, read: () => Promise<string>, parse: (text: string) => T): Promise<T> {
+  const text = await read();
+  try {
+    return parse(text);
+  } catch (e) {
+    throw new Error(`${file}：${e instanceof Error ? e.message : e}`);
+  }
+}
 const sameId = (a: string, b: string) => a.toLowerCase() === b.toLowerCase(); // 大文字小文字だけ違う名前も同じとみなす
 
 /** 表示順（カテゴリ順 → order → 名前）に並べる */
@@ -37,7 +47,8 @@ export async function loadTechniques(repo: string, token: string): Promise<Techn
   return Promise.all(
     names.map(async (n) => {
       const id = n.replace(/\.md$/, '');
-      const t = parseTechniqueMarkdown(await getTextFile(repo, token, `${DIR}/${n}`));
+      const file = `${DIR}/${n}`;
+      const t = await readParsed(file, () => getTextFile(repo, token, file), parseTechniqueMarkdown);
       return { ...t, id, name: t.name || id };
     }),
   );
@@ -47,7 +58,10 @@ export async function loadTechniques(repo: string, token: string): Promise<Techn
 async function logsUsing(repo: string, token: string, id: string) {
   const names = (await listDir(repo, token, LOGS_DIR)).filter((n) => n.endsWith('.md'));
   const logs = await Promise.all(
-    names.map(async (name) => ({ name, log: parseLogMarkdown(await getTextFile(repo, token, `${LOGS_DIR}/${name}`)) })),
+    names.map(async (name) => {
+      const file = `${LOGS_DIR}/${name}`;
+      return { name, log: await readParsed(file, () => getTextFile(repo, token, file), parseLogMarkdown) };
+    }),
   );
   return logs.filter((l) => l.log.techniques.includes(id));
 }

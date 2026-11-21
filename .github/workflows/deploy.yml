@@ -11,10 +11,11 @@ permissions:
   pages: write
   id-token: write
 
-# 投稿が続いたときは、古い公開を待たずに最新だけを公開する
+# 投稿が続いたときは、公開中のものは最後まで終えてから、待っている中の最新だけを公開する
+# （公開の途中で取り消すと、Pages の公開が中途半端な状態で止まることがあるため）
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
