@@ -218,7 +218,7 @@ export function initPostApp() {
     const orphans = [...checked].filter((id) => !known.has(id));
     if (orphans.length) groups.push({ category: 'リストにない技法', items: orphans.map((id) => ({ id, name: id, category: '' })) });
     chipsBox.replaceChildren(
-      Object.assign(document.createElement('legend'), { textContent: '試した技法' }),
+      Object.assign(document.createElement('legend'), { textContent: '実験技術' }),
       ...groups.map((g) => {
         const div = Object.assign(document.createElement('div'), { className: 'post-tech-group' });
         const chips = Object.assign(document.createElement('div'), { className: 'post-chips' });
@@ -298,7 +298,7 @@ export function initPostApp() {
       : !input.title
         ? '件名を入力してください。'
         : photos.length === 0 && !input.doya.length && !input.gunu.length && !input.used.length && !input.memo.trim()
-          ? '写真・使った材料・感想・メモのどれかを入力してください。'
+          ? '写真・使用材料・研究成果・メモのどれかを入力してください。'
           : hasNewPhotos && !bgCheck.checked
             ? '写真の背景を確認して、チェックを入れてください。'
             : !publicCheck.checked

@@ -40,7 +40,7 @@ const techniqueNames = await getTechniqueNames();
             </h2>
             <dl class="log-meta">
               <dt>件名</dt><dd>{log.data.title}</dd>
-              <dt>試した技術</dt>
+              <dt>実験技術</dt>
               <dd>
                 {log.data.techniques.map((t) => <a class="tag" href={url(`/techniques/${t.id}/`)}>{techniqueNames.get(t.id) ?? t.id}</a>)}
               </dd>

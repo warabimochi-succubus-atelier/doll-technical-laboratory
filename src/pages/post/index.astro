@@ -110,7 +110,7 @@ const siteUrl = new URL(url('/'), Astro.site).href;
           </label>
 
           <fieldset class="post-field" id="technique-chips">
-            <legend>試した技法</legend>
+            <legend>実験技術</legend>
             {groups.map((g) => (
               <div class="post-tech-group">
                 <p class="post-tech-category">{g.category}</p>
@@ -127,7 +127,7 @@ const siteUrl = new URL(url('/'), Astro.site).href;
           </fieldset>
 
           <label class="post-field">
-            <span>使った材料 <small>道具も含む・1行に1つ</small></span>
+            <span>使用材料 <small>道具も含む・1行に1つ</small></span>
             <textarea id="used" rows="3"></textarea>
           </label>
           <label class="post-field">

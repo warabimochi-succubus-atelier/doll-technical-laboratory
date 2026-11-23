@@ -23,19 +23,19 @@ const techniqueNames = await getTechniqueNames();
 
     <LogPhotos log={entry} />
 
-    <h2>試した技術</h2>
+    <h2>実験技術</h2>
     <p>{entry.data.techniques.map((t) => <a class="tag" href={url(`/techniques/${t.id}/`)}>{techniqueNames.get(t.id) ?? t.id}</a>)}</p>
 
-    {entry.data['使った材料'].length > 0 && (
+    {entry.data['使用材料'].length > 0 && (
       <>
-        <h2>使った材料</h2>
+        <h2>使用材料</h2>
         <ul class="used-list">
-          {entry.data['使った材料'].map((u) => <li>{u}</li>)}
+          {entry.data['使用材料'].map((u) => <li>{u}</li>)}
         </ul>
       </>
     )}
 
-    <h2>感想</h2>
+    <h2>研究成果</h2>
     <Impressions log={entry} />
 
     <div class="prose log-body"><Content /></div>
