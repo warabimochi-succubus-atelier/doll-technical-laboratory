@@ -23,7 +23,7 @@ export async function getTryCounts(): Promise<Map<string, number>> {
   return counts;
 }
 
-/** どやぁ / ぐぬぬ / はて？ ごとの感想の延べ数 */
+/** どやぁ / ぐぬぬ ごとの感想の延べ数 */
 export async function getReactionCounts() {
   const logs = await getCollection('logs');
   return reactions.map((r) => ({

@@ -58,9 +58,9 @@ export function initPostApp() {
   const title = $<HTMLInputElement>('title');
   const date = $<HTMLInputElement>('date');
   const fields = {
+    used: $<HTMLTextAreaElement>('used'),
     doya: $<HTMLTextAreaElement>('doya'),
     gunu: $<HTMLTextAreaElement>('gunu'),
-    hate: $<HTMLTextAreaElement>('hate'),
     memo: $<HTMLTextAreaElement>('memo'),
   };
   const formError = $('form-error');
@@ -241,9 +241,9 @@ export function initPostApp() {
     date.value = log.date;
     chipsBox.querySelectorAll<HTMLInputElement>('input[name="technique"]').forEach((c) => (c.checked = false));
     renderChips(currentTechniques, log.techniques);
+    fields.used.value = log.used.join('\n');
     fields.doya.value = log.doya.join('\n');
     fields.gunu.value = log.gunu.join('\n');
-    fields.hate.value = log.hate.join('\n');
     fields.memo.value = log.memo;
   };
 
@@ -251,9 +251,9 @@ export function initPostApp() {
     date: date.value || nowInJapan().date,
     title: title.value.trim(),
     techniques: [...form.querySelectorAll<HTMLInputElement>('input[name="technique"]:checked')].map((c) => c.value),
+    used: splitLines(fields.used.value),
     doya: splitLines(fields.doya.value),
     gunu: splitLines(fields.gunu.value),
-    hate: splitLines(fields.hate.value),
     memo: fields.memo.value,
   });
 
@@ -297,8 +297,8 @@ export function initPostApp() {
       ? 'GitHub の設定がまだです。右上の ⚙ から設定してください。'
       : !input.title
         ? '件名を入力してください。'
-        : photos.length === 0 && !input.doya.length && !input.gunu.length && !input.hate.length && !input.memo.trim()
-          ? '写真・感想・メモのどれかを入力してください。'
+        : photos.length === 0 && !input.doya.length && !input.gunu.length && !input.used.length && !input.memo.trim()
+          ? '写真・使ったもの・感想・メモのどれかを入力してください。'
           : hasNewPhotos && !bgCheck.checked
             ? '写真の背景を確認して、チェックを入れてください。'
             : !publicCheck.checked
@@ -473,7 +473,7 @@ export function initPostApp() {
       .then((text) => {
         const log = parseLogMarkdown(text);
         who.textContent = log.title || '（件名なし）';
-        const first = log.doya[0] ?? log.gunu[0] ?? log.hate[0] ?? log.memo.split('\n')[0] ?? '';
+        const first = log.doya[0] ?? log.gunu[0] ?? log.used[0] ?? log.memo.split('\n')[0] ?? '';
         sub.textContent = [log.photos.length ? `写真${log.photos.length}枚` : '', first].filter(Boolean).join('・');
       })
       .catch((err) => {

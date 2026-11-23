@@ -26,6 +26,15 @@ const techniqueNames = await getTechniqueNames();
     <h2>試した技術</h2>
     <p>{entry.data.techniques.map((t) => <a class="tag" href={url(`/techniques/${t.id}/`)}>{techniqueNames.get(t.id) ?? t.id}</a>)}</p>
 
+    {entry.data['使ったもの'].length > 0 && (
+      <>
+        <h2>使ったもの</h2>
+        <ul class="used-list">
+          {entry.data['使ったもの'].map((u) => <li>{u}</li>)}
+        </ul>
+      </>
+    )}
+
     <h2>感想</h2>
     <Impressions log={entry} />
 

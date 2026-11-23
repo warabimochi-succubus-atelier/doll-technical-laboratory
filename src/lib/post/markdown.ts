@@ -6,9 +6,9 @@ export interface LogInput {
   title: string;
   photos: string[]; // public/images/logs/ のファイル名
   techniques: string[]; // 技法 ID（techniques/ のファイル名）
+  used: string[]; // 使ったもの
   doya: string[];
   gunu: string[];
-  hate: string[];
   memo: string;
 }
 
@@ -25,9 +25,9 @@ export function buildLogMarkdown(input: LogInput): string {
     `title: ${quote(input.title)}`,
     list('photos', input.photos),
     list('techniques', input.techniques),
+    list('使ったもの', input.used),
     list('どやぁ', input.doya),
     list('ぐぬぬ', input.gunu),
-    list('はて？', input.hate),
     '---',
     '',
     input.memo.trim(),
@@ -126,9 +126,10 @@ export function parseLogMarkdown(text: string): LogInput {
     title: str('title') || str('doll'),
     photos: arr('photos'),
     techniques: arr('techniques'),
+    used: arr('使ったもの'),
     doya: arr('どやぁ'),
-    gunu: arr('ぐぬぬ'),
-    hate: arr('はて？'),
+    // 「はて？」は廃止したので、以前のログに残っていればぐぬぬに含める
+    gunu: [...arr('ぐぬぬ'), ...arr('はて？')],
     memo: body.trim(),
   };
 }

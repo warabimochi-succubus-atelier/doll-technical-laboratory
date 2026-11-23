@@ -50,10 +50,16 @@ const logs = defineCollection({
         )
         .transform((ids) => ids.map((id) => ({ collection: 'techniques' as const, id }))),
     ),
-    // 感想は どやぁ / ぐぬぬ / はて？ に分けて書く（どれも省略・空欄可）
+    // 使った道具・材料（1行に1つ。省略・空欄可）
+    '使ったもの': impressionList,
+    // 感想は どやぁ / ぐぬぬ に分けて書く（どちらも省略・空欄可）
     'どやぁ': impressionList,
     'ぐぬぬ': impressionList,
-    'はて？': impressionList,
+    // 「はて？」は廃止した。中身が残っていると黙って表示から消えるので、ビルドを止めて知らせる
+    'はて？': z.preprocess(
+      (v) => v ?? [],
+      z.array(z.string()).max(0, { message: '「はて？」はなくなりました。中身を「ぐぬぬ」に移してください' }),
+    ),
   }),
 });
 

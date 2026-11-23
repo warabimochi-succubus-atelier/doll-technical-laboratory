@@ -33,7 +33,7 @@ const fieldList = fields.map((f) => ({
 
   <section class="card">
     <h2>研究理念</h2>
-    <p>ここでは、次の3つをすべて研究として記録します。</p>
+    <p>ここでは、次の2つをどちらも研究として記録します。</p>
     <ul class="stance-list">
       {reactions.map((r) => (
         <li><span class="stance-word">{r.key}</span><span class="stance-note">{r.note}</span></li>
@@ -49,7 +49,7 @@ const fieldList = fields.map((f) => ({
     <h2>研究の進め方</h2>
     <p>
       制作のたびに<strong>「今日はどの技法を試してみるか」</strong>を意識して取り組み、<a href={url('/logs/')}>制作ログ</a>に残します。
-      感想は どやぁ／ぐぬぬ／はて？ に分けて書き、トップページの★として積み上がります。
+      感想は どやぁ／ぐぬぬ に分けて書き、トップページの★として積み上がります。
       試した技法には<a href={url('/techniques/')}>技術リスト</a>でチェックが付きます。
     </p>
     <p>
