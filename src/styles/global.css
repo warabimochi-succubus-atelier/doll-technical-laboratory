@@ -222,7 +222,8 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
 .tech-list .check { color: var(--accent); }
 .tech-list .count { margin-left: auto; font-size: .75rem; color: var(--muted); }
 
-.used-list { margin: 0; padding-left: 1.25rem; }
+/* 次の見出しとの間を、技法タグの段落のあとと同じだけ空ける */
+.used-list { margin: 0 0 1rem; padding-left: 1.25rem; }
 
 .prose:empty { display: none; }
 /* 制作ログの本文は、投稿アプリで入れた改行をそのまま見せる（Markdown では改行1つが無視されるため） */

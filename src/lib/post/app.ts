@@ -298,7 +298,7 @@ export function initPostApp() {
       : !input.title
         ? '件名を入力してください。'
         : photos.length === 0 && !input.doya.length && !input.gunu.length && !input.used.length && !input.memo.trim()
-          ? '写真・使ったもの・感想・メモのどれかを入力してください。'
+          ? '写真・使った材料・感想・メモのどれかを入力してください。'
           : hasNewPhotos && !bgCheck.checked
             ? '写真の背景を確認して、チェックを入れてください。'
             : !publicCheck.checked

@@ -50,8 +50,8 @@ const logs = defineCollection({
         )
         .transform((ids) => ids.map((id) => ({ collection: 'techniques' as const, id }))),
     ),
-    // 使った道具・材料（1行に1つ。省略・空欄可）
-    '使ったもの': impressionList,
+    // 使った材料（道具も含む。1行に1つ。省略・空欄可）
+    '使った材料': impressionList,
     // 感想は どやぁ / ぐぬぬ に分けて書く（どちらも省略・空欄可）
     'どやぁ': impressionList,
     'ぐぬぬ': impressionList,
