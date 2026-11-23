@@ -1,0 +1,21 @@
+---
+// 存在しない URL を開いたときのページ。GitHub Pages はサイトの 404.html を返す。
+// どの URL で表示されてもよいように、リンクは url() で base を付けた絶対パスにする
+import { url } from '../lib/url';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="ページが見つかりません" description="お探しのページは見つかりませんでした。">
+  <section class="card">
+    <h1>ページが見つかりません</h1>
+    <p class="lead">ぐぬぬ……このページは見つかりませんでした。</p>
+    <p>
+      URL が間違っているか、ページの場所が変わったのかもしれません。
+      技法の名前を変えると、その技法のページの URL も変わります。
+    </p>
+    <ul>
+      <li><a href={url('/')}>トップ</a></li>
+      <li><a href={url('/techniques/')}>技術リスト</a></li>
+      <li><a href={url('/logs/')}>制作ログ</a></li>
+    </ul>
+  </section>
+</BaseLayout>
