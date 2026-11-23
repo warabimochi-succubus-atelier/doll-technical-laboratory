@@ -223,6 +223,8 @@ main { max-width: 880px; margin: 0 auto; padding: 1.5rem 16px; }
 .tech-list .count { margin-left: auto; font-size: .75rem; color: var(--muted); }
 
 .prose:empty { display: none; }
+/* 制作ログの本文は、投稿アプリで入れた改行をそのまま見せる（Markdown では改行1つが無視されるため） */
+.log-body p { white-space: pre-line; }
 
 /* 投稿アプリ（/post/） */
 .post-app main { max-width: 640px; padding-bottom: 3rem; }
