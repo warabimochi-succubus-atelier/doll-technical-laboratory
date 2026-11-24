@@ -40,6 +40,8 @@ const logs = defineCollection({
     ),
     // 写真ごとの短い見出し（photos と同じ順。見出しのない写真は空文字。省略可）
     photoCaptions: z.preprocess((v) => v ?? [], z.array(z.preprocess((s) => s ?? '', z.string()))),
+    // 代表写真（トップページと制作ログ一覧のサムネイル）。photos のどれかのファイル名。省略すると1枚目
+    cover: z.string().optional(),
     // techniques/ のファイル名（拡張子なし）。技術リストにない名前があればビルドを止める
     // （Astro の reference() はエラーを表示するだけでビルドが通ってしまい、切れたリンクが公開されるため）
     techniques: z.preprocess(
@@ -62,6 +64,9 @@ const logs = defineCollection({
       (v) => v ?? [],
       z.array(z.string()).max(0, { message: '「はて？」はなくなりました。中身を「ぐぬぬ」に移してください' }),
     ),
+  }).refine((d) => !d.cover || d.photos.includes(d.cover), {
+    message: 'cover には photos に入っている写真のファイル名を書いてください',
+    path: ['cover'],
   }),
 });
 

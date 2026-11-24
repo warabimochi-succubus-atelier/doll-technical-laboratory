@@ -98,6 +98,7 @@ date: 2026-12-10
 title: DD桜
 photos:              # public/images/logs/ に置いた写真のファイル名（省略可）
   - 2026-12-10-1.jpg
+cover: 2026-12-10-1.jpg  # 代表写真（トップと一覧のサムネイル）。photos のどれか。省略すると1枚目
 photoCaptions:       # 写真ごとの短い見出し（photos と同じ順。なければ ""。省略可）
   - 下塗り
 techniques:          # techniques/ のファイル名（拡張子なし）

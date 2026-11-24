@@ -91,6 +91,7 @@ export function initPostApp() {
 
   let settings: Settings | undefined;
   let photos: Photo[] = [];
+  let coverPhoto: Photo | null = null; // 代表写真に選んだ写真（選んでいない・外したときは1枚目）
   let editing: Editing | null = null;
   let busy = false;
   let processing = 0; // 縮小中の写真の数
@@ -121,6 +122,8 @@ export function initPostApp() {
 
   // ---- 写真 ----
   const renderPhotos = () => {
+    if (coverPhoto && !photos.includes(coverPhoto)) coverPhoto = null;
+    const cover = coverPhoto ?? photos[0];
     photoList.replaceChildren(
       ...photos.map((p, i) => {
         const li = document.createElement('li');
@@ -167,8 +170,22 @@ export function initPostApp() {
           });
           return b;
         };
+        // 代表写真（トップページと制作ログ一覧のサムネイル）。★が今の代表、☆を押すとその写真が代表になる
+        const isCover = p === cover;
+        const star = Object.assign(document.createElement('button'), {
+          type: 'button',
+          className: `post-photo-cover${isCover ? ' is-cover' : ''}`,
+          textContent: isCover ? '★ 代表' : '☆',
+        });
+        star.setAttribute('aria-pressed', String(isCover));
+        star.setAttribute('aria-label', `写真${i + 1}を代表写真にする`);
+        star.addEventListener('click', () => {
+          coverPhoto = p;
+          renderPhotos();
+          photoList.children[i]?.querySelector<HTMLButtonElement>('.post-photo-cover')?.focus();
+        });
         const box = Object.assign(document.createElement('div'), { className: 'post-photo-thumb' });
-        box.append(img, del);
+        box.append(img, star, del);
         if (i > 0) box.append(move(-1, '‹', '前へ移す'));
         if (i < photos.length - 1) box.append(move(1, '›', '後ろへ移す'));
         li.append(box, caption);
@@ -213,6 +230,7 @@ export function initPostApp() {
   const clearPhotos = () => {
     photos.forEach((p) => URL.revokeObjectURL(p.preview));
     photos = [];
+    coverPhoto = null;
     renderPhotos();
   };
 
@@ -383,7 +401,7 @@ export function initPostApp() {
       }
       files.push({
         path: `${LOGS_DIR}/${stem}.md`,
-        base64: await textToBase64(buildLogMarkdown({ ...input, photos: photoNames, photoCaptions: photos.map((p) => p.caption.trim()) })),
+        base64: await textToBase64(buildLogMarkdown({ ...input, photos: photoNames, photoCaptions: photos.map((p) => p.caption.trim()), cover: coverPhoto ? photoNames[photos.indexOf(coverPhoto)] ?? '' : '' })),
       });
 
       status.textContent = '送信しています…';
@@ -455,6 +473,7 @@ export function initPostApp() {
       const bytes = base64ToBytes(await getFileBase64(repo, token, `${PHOTOS_DIR}/${name}`));
       photos.push({ name, caption: log.photoCaptions[i] ?? '', preview: URL.createObjectURL(new Blob([bytes], { type: 'image/jpeg' })) });
     }
+    coverPhoto = photos.find((p) => p.name === log.cover) ?? null;
     renderPhotos();
     setEditing({ stem, originalPhotos: log.photos });
     status.textContent = '';

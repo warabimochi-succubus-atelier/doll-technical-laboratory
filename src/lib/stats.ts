@@ -63,6 +63,13 @@ export function getLogPhotos(log: Log) {
   });
 }
 
+/** 代表写真（cover に書いた写真。なければ1枚目）。写真がなければ undefined */
+export function getLogCover(log: Log) {
+  const photos = getLogPhotos(log);
+  const i = log.data.cover ? log.data.photos.indexOf(log.data.cover) : -1;
+  return photos[Math.max(i, 0)];
+}
+
 export function formatDate(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
