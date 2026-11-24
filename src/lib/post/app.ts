@@ -145,17 +145,32 @@ export function initPostApp() {
             caption.blur();
           }
         });
-        const del = document.createElement('button');
-        del.type = 'button';
-        del.textContent = '×';
+        const del = Object.assign(document.createElement('button'), { type: 'button', className: 'post-photo-del', textContent: '×' });
         del.setAttribute('aria-label', `写真${i + 1}を外す`);
         del.addEventListener('click', () => {
           URL.revokeObjectURL(p.preview);
           photos.splice(i, 1);
           renderPhotos();
         });
+        // 並べ替え：左右の写真と入れ替える（先頭の ‹ と末尾の › は出さない）
+        const move = (step: -1 | 1, text: string, label: string) => {
+          const b = Object.assign(document.createElement('button'), { type: 'button', className: `post-photo-move post-photo-move-${step < 0 ? 'prev' : 'next'}`, textContent: text });
+          b.setAttribute('aria-label', `写真${i + 1}を${label}`);
+          b.addEventListener('click', () => {
+            const j = i + step;
+            [photos[i], photos[j]] = [photos[j], photos[i]];
+            renderPhotos();
+            // 続けて動かせるよう、移った先の同じボタン（なければ反対側）にフォーカスを戻す
+            const moved = photoList.children[j];
+            moved?.querySelector<HTMLButtonElement>(`.post-photo-move-${step < 0 ? 'prev' : 'next'}`)?.focus() ??
+              moved?.querySelector<HTMLButtonElement>('.post-photo-move')?.focus();
+          });
+          return b;
+        };
         const box = Object.assign(document.createElement('div'), { className: 'post-photo-thumb' });
         box.append(img, del);
+        if (i > 0) box.append(move(-1, '‹', '前へ移す'));
+        if (i < photos.length - 1) box.append(move(1, '›', '後ろへ移す'));
         li.append(box, caption);
         return li;
       }),
