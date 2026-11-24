@@ -19,6 +19,7 @@ import type { Field } from './categories';
 
 export const DEFAULT_REPO = 'warabimochi-succubus-atelier/doll-technical-laboratory';
 const MAX_PHOTOS = 5;
+const MAX_CAPTION = 20; // 写真の見出しの最大文字数
 const LOGS_DIR = 'src/content/logs';
 const PHOTOS_DIR = 'public/images/logs';
 const PAST_PAGE = 10;
@@ -38,8 +39,8 @@ export function describeError(e: unknown): string {
   return e instanceof Error ? e.message : '原因の分からないエラーが起きました。';
 }
 
-/** 写真：新しく選んだもの（blob）と、編集中のログにもともと付いていたもの（name） */
-type Photo = { preview: string } & ({ blob: Blob; name?: undefined } | { name: string; blob?: undefined });
+/** 写真：新しく選んだもの（blob）と、編集中のログにもともと付いていたもの（name）。caption は短い見出し（空欄可） */
+type Photo = { preview: string; caption: string } & ({ blob: Blob; name?: undefined } | { name: string; blob?: undefined });
 
 /** 編集中のログ */
 interface Editing {
@@ -126,6 +127,24 @@ export function initPostApp() {
         const img = document.createElement('img');
         img.src = p.preview;
         img.alt = `写真${i + 1}`;
+        // 短い見出し（「下塗り」「乾燥後」など。空欄可）
+        const caption = Object.assign(document.createElement('input'), {
+          type: 'text',
+          value: p.caption,
+          maxLength: MAX_CAPTION,
+          placeholder: '見出し（任意）',
+          className: 'post-photo-caption',
+          enterKeyHint: 'done',
+        });
+        caption.setAttribute('aria-label', `写真${i + 1}の見出し`);
+        caption.addEventListener('input', () => (p.caption = caption.value));
+        // 見出し欄で改行キーを押しても投稿されないようにする（キーボードを閉じるだけ）
+        caption.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.isComposing) {
+            e.preventDefault();
+            caption.blur();
+          }
+        });
         const del = document.createElement('button');
         del.type = 'button';
         del.textContent = '×';
@@ -135,7 +154,9 @@ export function initPostApp() {
           photos.splice(i, 1);
           renderPhotos();
         });
-        li.append(img, del);
+        const box = Object.assign(document.createElement('div'), { className: 'post-photo-thumb' });
+        box.append(img, del);
+        li.append(box, caption);
         return li;
       }),
     );
@@ -158,7 +179,7 @@ export function initPostApp() {
       try {
         const blob = await resizeToJpeg(file);
         if (generation === formGeneration) {
-          photos.push({ blob, preview: URL.createObjectURL(blob) });
+          photos.push({ blob, caption: '', preview: URL.createObjectURL(blob) });
           renderPhotos();
         }
       } catch (e) {
@@ -347,7 +368,7 @@ export function initPostApp() {
       }
       files.push({
         path: `${LOGS_DIR}/${stem}.md`,
-        base64: await textToBase64(buildLogMarkdown({ ...input, photos: photoNames })),
+        base64: await textToBase64(buildLogMarkdown({ ...input, photos: photoNames, photoCaptions: photos.map((p) => p.caption.trim()) })),
       });
 
       status.textContent = '送信しています…';
@@ -414,10 +435,10 @@ export function initPostApp() {
     const log = parseLogMarkdown(await getTextFile(repo, token, `${LOGS_DIR}/${stem}.md`));
     resetForm();
     fillForm(log);
-    for (const name of log.photos) {
+    for (const [i, name] of log.photos.entries()) {
       // 投稿直後でサイトに未反映の写真もあるので、GitHub から直接読む
       const bytes = base64ToBytes(await getFileBase64(repo, token, `${PHOTOS_DIR}/${name}`));
-      photos.push({ name, preview: URL.createObjectURL(new Blob([bytes], { type: 'image/jpeg' })) });
+      photos.push({ name, caption: log.photoCaptions[i] ?? '', preview: URL.createObjectURL(new Blob([bytes], { type: 'image/jpeg' })) });
     }
     renderPhotos();
     setEditing({ stem, originalPhotos: log.photos });

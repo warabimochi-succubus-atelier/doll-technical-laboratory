@@ -50,13 +50,17 @@ export async function getTechniquesByCategory() {
   }));
 }
 
-/** ログの写真（URL と説明文）。説明文は「件名 日付 写真N」で自動生成する */
+/** ログの写真（URL・説明文・見出し）。説明文は「件名 日付 写真N」（見出しがあれば後ろに付ける）で自動生成する */
 export function getLogPhotos(log: Log) {
   const date = formatDate(log.data.date);
-  return log.data.photos.map((name, i) => ({
-    src: url(`/images/logs/${name}`),
-    alt: `${log.data.title} ${date} 写真${i + 1}`,
-  }));
+  return log.data.photos.map((name, i) => {
+    const caption = log.data.photoCaptions[i]?.trim() ?? '';
+    return {
+      src: url(`/images/logs/${name}`),
+      alt: `${log.data.title} ${date} 写真${i + 1}${caption ? ` ${caption}` : ''}`,
+      caption,
+    };
+  });
 }
 
 export function formatDate(d: Date) {

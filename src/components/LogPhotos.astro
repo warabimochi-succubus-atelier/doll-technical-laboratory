@@ -13,9 +13,10 @@ const photos = getLogPhotos(log);
     <ul class="photo-grid">
       {photos.map((p, i) => (
         <li>
-          <button type="button" class="photo-thumb" data-index={i} aria-label={`${p.alt}を拡大`}>
+          <button type="button" class="photo-thumb" data-index={i} data-caption={p.caption} aria-label={`${p.alt}を拡大`}>
             <img src={p.src} alt={p.alt} loading="lazy" decoding="async" />
           </button>
+          {p.caption && <span class="photo-caption" aria-hidden="true">{p.caption}</span>}
         </li>
       ))}
     </ul>
@@ -37,6 +38,7 @@ const photos = getLogPhotos(log);
 <script>
   document.querySelectorAll<HTMLElement>('[data-photo-gallery]').forEach((gallery) => {
     const thumbs = [...gallery.querySelectorAll<HTMLImageElement>('.photo-thumb img')];
+    const captions = [...gallery.querySelectorAll<HTMLElement>('.photo-thumb')].map((b) => b.dataset.caption ?? '');
     const dialog = gallery.querySelector<HTMLDialogElement>('.lightbox')!;
     const img = dialog.querySelector<HTMLImageElement>('.lightbox-img')!;
     const count = dialog.querySelector<HTMLElement>('.lightbox-count')!;
@@ -46,7 +48,7 @@ const photos = getLogPhotos(log);
       current = (i + thumbs.length) % thumbs.length;
       img.src = thumbs[current].src;
       img.alt = thumbs[current].alt;
-      count.textContent = `${current + 1} / ${thumbs.length}`;
+      count.textContent = `${current + 1} / ${thumbs.length}${captions[current] ? `　${captions[current]}` : ''}`;
     };
 
     gallery.querySelectorAll<HTMLButtonElement>('.photo-thumb').forEach((btn) => {

@@ -5,6 +5,7 @@ export interface LogInput {
   date: string; // YYYY-MM-DD
   title: string;
   photos: string[]; // public/images/logs/ のファイル名
+  photoCaptions: string[]; // 写真ごとの短い見出し（なければ空文字）。photos と同じ順
   techniques: string[]; // 技法 ID（techniques/ のファイル名）
   used: string[]; // 使用材料
   doya: string[];
@@ -24,6 +25,8 @@ export function buildLogMarkdown(input: LogInput): string {
     `date: ${input.date}`,
     `title: ${quote(input.title)}`,
     list('photos', input.photos),
+    // 見出しが1つもないときは項目ごと書かない
+    ...(input.photoCaptions.some(Boolean) ? [list('photoCaptions', input.photos.map((_, i) => input.photoCaptions[i] ?? ''))] : []),
     list('techniques', input.techniques),
     list('使用材料', input.used),
     list('どやぁ', input.doya),
@@ -125,6 +128,7 @@ export function parseLogMarkdown(text: string): LogInput {
     // 以前のログは doll: で書いていたので、そちらも読む
     title: str('title') || str('doll'),
     photos: arr('photos'),
+    photoCaptions: arr('photoCaptions'),
     techniques: arr('techniques'),
     // 以前は「使ったもの」「使った材料」という名前だったので、そちらも読む
     used: [...arr('使用材料'), ...arr('使った材料'), ...arr('使ったもの')],
